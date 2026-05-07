@@ -32,19 +32,13 @@ FETCH_KEYWORDS = {
     "inflation_protection":["inflation", "inflation protection"],
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# REPORT KNOWLEDGE BASE  (from Tell Us The Odds sample report)
-# AI આ data વાપરીને user ના સવાલોના જવાબ આપી શકે છે.
-# ─────────────────────────────────────────────────────────────────────────────
 REPORT_KNOWLEDGE = """
-╔══════════════════════════════════════════════════════════════╗
+
    TELL US THE ODDS — LTC ACTUARIAL KNOWLEDGE BASE
    Source: Official Sample Report, Tell Us The Odds LLC © 2026
-╚══════════════════════════════════════════════════════════════╝
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. CLAIM PROBABILITY  (How likely is a claim?)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Overall: Only 41% of LTC policyholders ever file a claim.
 
 Breakdown by duration:
@@ -59,9 +53,9 @@ Breakdown by duration:
 Key insight: Most people (59%) never need to use their LTC policy.
 Among those who do claim, the majority (14%) need care for less than 1 year.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 2. CLAIM DURATION BY AGE  (How long does care last?)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
 Claim duration depends heavily on what age the claim starts.
 
 If claim starts at age 71-74 (younger):
