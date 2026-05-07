@@ -730,15 +730,36 @@ export default function App() {
               </div>
               {allMessages.length === 0 && (
                 <div style={{ padding: "10px 16px 0", display: "flex", flexWrap: "wrap", gap: 6, flexShrink: 0, background: "#f8fafc" }}>
-                  {["Start my intake form", "What is my premium?", "Show all my details", "What are my LTC options?"].map((q) => (
-                    <button key={q} onClick={() => {
-                      const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                      setUserMessages(p => [...p, { type: "user", text: q, timestamp: now, id: Date.now() }]);
-                      send(q);
-                    }} style={{ fontSize: 11, padding: "5px 10px", border: "1px solid #bfdbfe", borderRadius: 20, background: "#fff", color: "#1d4ed8", cursor: "pointer", fontFamily: "inherit" }}>
+                  {[
+                    "Start my intake form",
+                    "What is my claim probability?",
+                    "Which option has the best value?",
+                    "What does elimination period mean?",
+                    "How does inflation protection work?",
+                    "Show all my details",
+                  ].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => {
+                        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                        setUserMessages(p => [...p, { type: "user", text: q, timestamp: now, id: Date.now() }]);
+                        send(q);
+                      }}
+                      style={{
+                        fontSize: 11,
+                        padding: "5px 10px",
+                        border: "1px solid #bfdbfe",
+                        borderRadius: 20,
+                        background: "#fff",
+                        color: "#1d4ed8",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
                       {q}
                     </button>
                   ))}
+
                 </div>
               )}
               <div className="scroll-hide" style={{ flex: 1, overflowY: "auto", padding: "24px 16px", color: "#334155", background: "#f8fafc" }}>

@@ -17,7 +17,7 @@ if not firebase_admin._apps:
 
 _executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
-# Firebase is ONLY used for real-time presence (typing + online status)
+# Firebase is ONLY used for real-time  (typing + online status)
 _status_ref = firebase_db.reference("status")
 
 class ConnectionManager:
