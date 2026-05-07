@@ -1,0 +1,85 @@
+fastapi
+uvicorn
+groq
+firebase-admin
+
+
+
+# ══════════════════════════════════════════════════════════════
+#  SETUP GUIDE — Firebase serviceAccountKey.json
+# ══════════════════════════════════════════════════════════════
+#
+#  1. Firebase Console → https://console.firebase.google.com
+#  2. Tamaro project select karo
+#  3. Project Settings (gear icon) → Service Accounts tab
+#  4. "Generate new private key" button click karo
+#  5. Download thayel JSON file ne rename karo:
+#         serviceAccountKey.json
+#  6. Aa file tamara project root ma rakho (main.py sathe)
+#  7. .gitignore ma add karo  ← IMPORTANT (key public na thay)
+#
+#
+# ══════════════════════════════════════════════════════════════
+#  websocket_manager.py ma databaseURL replace karo
+# ══════════════════════════════════════════════════════════════
+#
+#  Firebase Console → Project Settings → General tab →
+#  "Your apps" section → databaseURL copy karo
+#
+#  Format:
+#  https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com
+#
+#
+# ══════════════════════════════════════════════════════════════
+#  FIREBASE REALTIME DATABASE — SECURITY RULES
+#  Firebase Console → Realtime Database → Rules tab
+# ══════════════════════════════════════════════════════════════
+#
+# {
+#   "rules": {
+#     "chats": {
+#       "$sessionId": {
+#         ".read": true,
+#         ".write": true
+#       }
+#     },
+#     "chat_messages": {
+#       "$sessionId": {
+#         ".read": true,
+#         ".write": true
+#       }
+#     },
+#     "status": {
+#       "$sessionId": {
+#         ".read": true,
+#         ".write": true
+#       }
+#     }
+#   }
+# }
+#
+#
+# ══════════════════════════════════════════════════════════════
+#  FILE CHANGES SUMMARY
+# ══════════════════════════════════════════════════════════════
+#
+#  websocket_manager.py
+#    CHANGED : Firebase initialize + _session_map added
+#    SAME    : connect(), disconnect(), send_personal_message()
+#
+#  chat_service.py
+#    CHANGED : SQLAlchemy (db.add / db.commit) → Firebase push()
+#              ChatMessage SQLAlchemy model → Python dataclass
+#              save_and_get_bot_response(db, text) → (text, session_id)
+#    SAME    : get_ai_response() — bilkul same Groq call
+#
+#  chat_router.py
+#    CHANGED : db = sessionLocal() → hatavi nakhyu
+#              save_and_get_bot_response(db, msg) → (msg, session)
+#              manager.connect(ws) → manager.connect(ws, session_id)
+#    SAME    : /ws/chat path, welcome message, response format
+#              manager.disconnect(), manager.send_personal_message()
+#              GET / and GET /health endpoints
+#
+#  DELETED  : app/db/session.py  (no longer needed)
+#             app/models/chat.py (replaced by dataclass)

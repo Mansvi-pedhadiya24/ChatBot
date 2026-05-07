@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+*.sqlite3
+*.db
+.venv/
+venv/
+ENV/
+.envrc
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+/build
+/dist
+/.vite
+/.cache
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
+
+# Python packaging
+*.egg-info/
+.eggs/
+*.egg
+
+# Firebase / service account
+serviceAccountKey.json
+*.key
+
+# Alembic / migrations
+alembic/versions/*.pyc
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+
+# Backup files
+*~
+*.swp
+*.swo
