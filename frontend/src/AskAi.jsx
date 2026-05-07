@@ -195,6 +195,71 @@ const Message = ({ msg, isUser }) => {
   );
 };
 
+// ──  Widget snippet Button ──
+const FloatingChatButton = ({ onClick, isOpen }) => {
+  const [showLabel, setShowLabel] = useState(true);
+
+  return (
+    <>
+      <style>{`
+        @keyframes fabPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .fab-btn { transition: transform 0.2s, background 0.2s; }
+        .fab-btn:hover { transform: scale(1.08) !important; background: #1a4a7a !important; }
+      `}</style>
+
+      {/* Label tooltip */}
+      {showLabel && !isOpen && (
+        <div style={{
+          position: "fixed", bottom: 34, right: 88,
+          background: "#fff", border: "1px solid #e2e8f0",
+          borderRadius: 20, padding: "5px 12px",
+          fontSize: 14, color: "#334155", whiteSpace: "nowrap",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          animation: "fabPop 0.3s ease-out",
+          zIndex: 9998,
+        }}>
+          Free to Ask
+          <button onClick={() => setShowLabel(false)}
+            style={{ marginLeft: 6, background: "none", border: "none", cursor: "pointer", fontSize: 11, color: "#94a3b8", padding: 0 }}>
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* FAB Button */}
+      <button
+        className="fab-btn"
+        onClick={onClick}
+        aria-label={isOpen ? "close the chat" : "Free to ask"}
+        style={{
+          position: "fixed", bottom: 24, right: 24,
+          width: 56, height: 56,
+          borderRadius: "50%",
+          background: "#0f3460",
+          border: "none",
+          cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+          zIndex: 9999,
+          fontSize: 24, color: "#fff",
+        }}
+      >
+        {isOpen ? "✕" : "💬"}
+        {/* Notification badge */}
+        {!isOpen && (
+          <span style={{
+            position: "absolute", top: 2, right: 2,
+            width: 14, height: 14, borderRadius: "50%",
+            background: "#d4af37", border: "2px solid #fff",
+            fontSize: 8, fontWeight: 700, color: "#7a5a00",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>1</span>
+        )}
+      </button>
+    </>
+  );
+};
+
 const TypingIndicator = () => (
   <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 16 }}>
     <div style={{ padding: "12px 16px", borderRadius: "12px 12px 12px 2px", background: "#ffffff", border: "1px solid #e2e8f0", display: "flex", gap: 4, alignItems: "center" }}>
@@ -640,6 +705,7 @@ export default function App() {
   const typing = useTyping(sessionId);
   const { policy, versions, loading, fetchPolicy, fetchVersions, resetPolicy } = usePolicyData(sessionId);
 
+  const [chatOpen, setChatOpen] = useState(false);
   const [input, setInput] = useState("");
   const [userMessages, setUserMessages] = useState([]);
   const [tab, setTab] = useState("chat");
@@ -704,107 +770,127 @@ export default function App() {
         .tab-btn:hover:not(.active) { color:#334155; background:#f8fafc; }
       `}</style>
 
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ width: "100%", maxWidth: 420, height: "85vh", display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", background: "#ffffff", boxShadow: "0 25px 50px -12px rgba(0,0,0,.15)", border: "1px solid #e2e8f0" }}>
+      <FloatingChatButton
+        onClick={() => setChatOpen(prev => !prev)}
+        isOpen={chatOpen}
+      />
 
-          <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, #0f3460 0%, #1a4a7a 100%)", borderBottom: "3px solid #d4af37", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 4, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📈</div>
-              <div>
-                <div style={{ color: "#fff", fontWeight: 600, fontSize: "15px", fontFamily: "Lora, serif", letterSpacing: "0.2px" }}>Tell Us The Odds℠</div>
-                <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1px" }}>Valuation Services</div>
+      {/* ── Chat Widget (show/hide) ── */}
+      {chatOpen && (
+        <div style={{
+          position: "fixed", bottom: 90, right: 24,
+          width: 420, height: "85vh",
+          zIndex: 9997,
+          borderRadius: 12,
+          overflow: "hidden",
+          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.3)",
+          animation: "fabPop 0.25s ease-out",
+        }}>
+          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+            <div style={{ width: "100%", maxWidth: 420, height: "85vh", display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", background: "#ffffff", boxShadow: "0 25px 50px -12px rgba(0,0,0,.15)", border: "1px solid #e2e8f0" }}>
+
+              <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, #0f3460 0%, #1a4a7a 100%)", borderBottom: "3px solid #d4af37", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 4, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📈</div>
+                  <div>
+                    <div style={{ color: "#fff", fontWeight: 600, fontSize: "15px", fontFamily: "Lora, serif", letterSpacing: "0.2px" }}>Tell Us The Odds℠</div>
+                    <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1px" }}>Valuation Services</div>
+                  </div>
+                </div>
+                <StatusDot status={status} />
+              </div>
+
+              <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", flexShrink: 0, background: "#f8fafc" }}>
+                <button className={`tab-btn ${tab === "chat" ? "active" : ""}`} onClick={() => setTab("chat")}>💬 Chat</button>
+                <button className={`tab-btn ${tab === "policy" ? "active" : ""}`} onClick={() => setTab("policy")}>📋 My Policy</button>
+              </div>
+
+              {tab === "chat" && (
+                <>
+                  <div style={{ background: "#f0f9ff", borderBottom: "1px solid #e0f2fe", padding: "5px 16px", fontSize: "10.5px", color: "#0369a1", display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+                    ℹ️ Educational guidance only — not financial or legal advice.
+                  </div>
+                  {allMessages.length === 0 && (
+                    <div style={{ padding: "10px 16px 0", display: "flex", flexWrap: "wrap", gap: 6, flexShrink: 0, background: "#f8fafc" }}>
+                      {[
+                        "Start my intake form",
+                        "What is my claim probability?",
+                        "Which option has the best value?",
+                        "What does elimination period mean?",
+                        "How does inflation protection work?",
+                        "Show all my details",
+                      ].map((q) => (
+                        <button
+                          key={q}
+                          onClick={() => {
+                            const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                            setUserMessages(p => [...p, { type: "user", text: q, timestamp: now, id: Date.now() }]);
+                            send(q);
+                          }}
+                          style={{
+                            fontSize: 11,
+                            padding: "5px 10px",
+                            border: "1px solid #bfdbfe",
+                            borderRadius: 20,
+                            background: "#fff",
+                            color: "#1d4ed8",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                          }}
+                        >
+                          {q}
+                        </button>
+                      ))}
+
+                    </div>
+                  )}
+                  <div className="scroll-hide" style={{ flex: 1, overflowY: "auto", padding: "24px 16px", color: "#334155", background: "#f8fafc" }}>
+                    {allMessages.length === 0 && (
+                      <div style={{ textAlign: "center", color: "#64748b", marginTop: "30%" }}>
+                        <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.5 }}>📝</div>
+                        <p style={{ fontSize: 14, fontWeight: 500 }}>How can we help with your policy analysis today?</p>
+                      </div>
+                    )}
+                    {allMessages.map((msg) => <Message key={msg.id} msg={msg} isUser={msg.type === "user"} />)}
+                    {typing && <TypingIndicator />}
+                    <div ref={bottomRef} />
+                  </div>
+                  <div style={{ padding: "16px", background: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: 10, alignItems: "center" }}>
+                    <textarea rows={1} value={input} onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
+                      placeholder="Type your message..." disabled={status !== "connected"}
+                      style={{ flex: 1, padding: "12px", borderRadius: 8, border: "1px solid #cbd5e0", background: "#fdfdfd", fontSize: "14px", resize: "none", outline: "none", fontFamily: "inherit", color: "#1a202c" }}
+                    />
+                    <button onClick={handleSend} disabled={!input.trim() || status !== "connected"}
+                      style={{ width: 44, height: 44, borderRadius: 8, border: "none", background: input.trim() && status === "connected" ? "#1a4a7a" : "#cbd5e0", color: "#fff", cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      ➤
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {tab === "policy" && (
+                <PolicyTab
+                  sessionID={sessionId}
+                  policy={policy}
+                  versions={versions}
+                  loading={loading}
+                  fetchPolicy={fetchPolicy}
+                  fetchVersions={fetchVersions}
+                  resetPolicy={handleFullReset}
+                  onGoToChat={() => setTab("chat")}
+                />
+              )}
+
+              <div style={{ padding: "8px", textAlign: "center", fontSize: "10px", color: "#94a3b8", background: "#f8fafc", borderTop: "1px solid #f1f5f9" }}>
+                Sutter's Mill Valuation Services
               </div>
             </div>
-            <StatusDot status={status} />
-          </div>
-
-          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", flexShrink: 0, background: "#f8fafc" }}>
-            <button className={`tab-btn ${tab === "chat" ? "active" : ""}`} onClick={() => setTab("chat")}>💬 Chat</button>
-            <button className={`tab-btn ${tab === "policy" ? "active" : ""}`} onClick={() => setTab("policy")}>📋 My Policy</button>
-          </div>
-
-          {tab === "chat" && (
-            <>
-              <div style={{ background: "#f0f9ff", borderBottom: "1px solid #e0f2fe", padding: "5px 16px", fontSize: "10.5px", color: "#0369a1", display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
-                ℹ️ Educational guidance only — not financial or legal advice.
-              </div>
-              {allMessages.length === 0 && (
-                <div style={{ padding: "10px 16px 0", display: "flex", flexWrap: "wrap", gap: 6, flexShrink: 0, background: "#f8fafc" }}>
-                  {[
-                    "Start my intake form",
-                    "What is my claim probability?",
-                    "Which option has the best value?",
-                    "What does elimination period mean?",
-                    "How does inflation protection work?",
-                    "Show all my details",
-                  ].map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => {
-                        const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                        setUserMessages(p => [...p, { type: "user", text: q, timestamp: now, id: Date.now() }]);
-                        send(q);
-                      }}
-                      style={{
-                        fontSize: 11,
-                        padding: "5px 10px",
-                        border: "1px solid #bfdbfe",
-                        borderRadius: 20,
-                        background: "#fff",
-                        color: "#1d4ed8",
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      {q}
-                    </button>
-                  ))}
-
-                </div>
-              )}
-              <div className="scroll-hide" style={{ flex: 1, overflowY: "auto", padding: "24px 16px", color: "#334155", background: "#f8fafc" }}>
-                {allMessages.length === 0 && (
-                  <div style={{ textAlign: "center", color: "#64748b", marginTop: "30%" }}>
-                    <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.5 }}>📝</div>
-                    <p style={{ fontSize: 14, fontWeight: 500 }}>How can we help with your policy analysis today?</p>
-                  </div>
-                )}
-                {allMessages.map((msg) => <Message key={msg.id} msg={msg} isUser={msg.type === "user"} />)}
-                {typing && <TypingIndicator />}
-                <div ref={bottomRef} />
-              </div>
-              <div style={{ padding: "16px", background: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: 10, alignItems: "center" }}>
-                <textarea rows={1} value={input} onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
-                  placeholder="Type your message..." disabled={status !== "connected"}
-                  style={{ flex: 1, padding: "12px", borderRadius: 8, border: "1px solid #cbd5e0", background: "#fdfdfd", fontSize: "14px", resize: "none", outline: "none", fontFamily: "inherit", color: "#1a202c" }}
-                />
-                <button onClick={handleSend} disabled={!input.trim() || status !== "connected"}
-                  style={{ width: 44, height: 44, borderRadius: 8, border: "none", background: input.trim() && status === "connected" ? "#1a4a7a" : "#cbd5e0", color: "#fff", cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  ➤
-                </button>
-              </div>
-            </>
-          )}
-
-          {tab === "policy" && (
-            <PolicyTab
-              sessionID={sessionId}
-              policy={policy}
-              versions={versions}
-              loading={loading}
-              fetchPolicy={fetchPolicy}
-              fetchVersions={fetchVersions}
-              resetPolicy={handleFullReset}
-              onGoToChat={() => setTab("chat")}
-            />
-          )}
-
-          <div style={{ padding: "8px", textAlign: "center", fontSize: "10px", color: "#94a3b8", background: "#f8fafc", borderTop: "1px solid #f1f5f9" }}>
-            Sutter's Mill Valuation Services
           </div>
         </div>
-      </div>
+      )}
+
+
     </>
   );
 }
