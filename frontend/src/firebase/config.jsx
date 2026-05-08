@@ -13,4 +13,4 @@ const firebaseConfig = {
 
 const fbApp = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export const db = getDatabase(fbApp);
-export const API = "http://localhost:8000";
+export const API = "http://192.168.0.245:8000";

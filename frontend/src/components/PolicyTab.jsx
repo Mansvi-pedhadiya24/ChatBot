@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { FIELDS } from "../constants/fileds";
 import { HistoryDrawer } from "./HistoryDrawer";
 import { DecisionPanel } from "./DecisionPanel";
+import { API } from "../firebase/config";
 
 export const PolicyTab = ({ sessionID, policy, versions, loading, fetchPolicy, fetchVersions, resetPolicy, onGoToChat }) => {
   const [editingKey, setEditingKey] = useState(null);
