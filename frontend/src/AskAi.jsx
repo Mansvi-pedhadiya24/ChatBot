@@ -11,7 +11,7 @@ import { generateNewSessionId } from "./utils/session";
 
 export default function App() {
   const [sessionId, setSessionId] = useState("");
-  const wsUrl = `ws://192.168.0.245:8000/ws/chat?session_id=${sessionId}`;
+  const wsUrl = `ws://192.168.0.245:8001/ws/chat?session_id=${sessionId}`;
   const { status, messages, send } = useWebSocket(wsUrl, sessionId);
   const typing = useTyping(sessionId);
   const { policy, versions, loading, fetchPolicy, fetchVersions, resetPolicy } = usePolicyData(sessionId);
