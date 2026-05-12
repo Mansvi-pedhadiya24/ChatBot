@@ -32,6 +32,16 @@
 #     "inflation_protection":["inflation", "inflation protection"],
 # }
 
+# RESET_KEYWORDS = [
+#     "new form", "start over", "start fresh", "reset", "new intake",
+#     "start new", "clear my data", "begin again", "start again",
+# ]
+
+# ANALYZE_KEYWORDS = [
+#     "analyze", "analyse", "analysis", "decision", "should i keep",
+#     "keep or sell", "keep or lapse", "what should i do", "recommend",
+# ]
+
 # REPORT_KNOWLEDGE = """
 
 #    TELL US THE ODDS — LTC ACTUARIAL KNOWLEDGE BASE
@@ -55,9 +65,6 @@
 
 # 2. CLAIM DURATION BY AGE  (How long does care last?)
 
-
-# Claim duration depends heavily on what age the claim starts.
-
 # If claim starts at age 71-74 (younger):
 #   • 75th percentile: ~7.5 years of care
 #   • 50th percentile: ~4.5 years of care
@@ -74,14 +81,11 @@
 #   • Median:          ~1.2 years of care
 
 # Key insight: Starting a claim younger = longer care duration needed.
-# This means younger policyholders benefit MORE from keeping their policy.
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 3. RISK COMPARISON  (Death vs. LTC need)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Annual probability by age:
 
-#   Age 71: Death ~0.5%,   LTC ~0.4%   (both very low)
+# Annual probability by age:
+#   Age 71: Death ~0.5%,   LTC ~0.4%
 #   Age 75: Death ~1.2%,   LTC ~1.0%
 #   Age 79: Death ~2.5%,   LTC ~2.3%   (nearly equal)
 #   Age 83: Death ~4.5%,   LTC ~4.0%
@@ -89,108 +93,59 @@
 #   Age 91: Death ~10%,    LTC ~8%
 #   Age 95: Death ~14%,    LTC ~9%
 
-# Key insight: Between ages 79-83, risk of needing LTC is almost equal
-# to risk of death. After age 83, death risk grows faster than LTC risk.
+# Key insight: Between ages 79-83, risk of needing LTC is almost equal to risk of death.
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 4. MOST LIKELY CLAIM SCENARIOS
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Sum of ALL claim probabilities = 41% (59% never claim)
-
-# Probability bands:
-#   • Bottom 40% probability scenarios  → Very unlikely claims
-#   • Next 30% probability scenarios    → Somewhat possible
-#   • Next 20% probability scenarios    → Moderately likely
-#   • Top 10% probability scenarios     → Most likely to happen
 
 # Highest probability (Top 10%) scenarios cluster at:
 #   • Age at claim start: 80 to 93 years old
 #   • Duration: 1 to 2 years of care
-#   → This is the "sweet spot" — most common real-world claim
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 5. BENEFIT / COST RATIO  (Is the policy worth paying for?)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 # Formula: Value of expected benefits ÷ Total premiums paid = Ratio
-# A ratio above 100% means you get MORE than you pay in. Below 100% = you pay more than you get.
 
-# Five options compared (from sample report):
+#   Option 1 — Keep as-is:               Ratio: 149% ✅ BEST VALUE
+#   Option 2 — Reduced daily benefit:     Ratio: 140%
+#   Option 3 — Reduced benefit period:    Ratio: 132%
+#   Option 4 — Longer elimination period: Ratio: 88%  ❌ ONLY BELOW 100%
+#   Option 5 — Reduced paid-up:           Ratio: N/A  (no ongoing cost)
 
-#   Option 1 — Current situation (keep as-is):
-#     Benefits: $35,120  |  Premiums: $23,644  |  Ratio: 149% ✅ BEST VALUE
-#     → You get $1.49 in benefits for every $1.00 you pay
+# Key insight: Option 1 (keep current) delivers the BEST ratio.
+# Increasing the elimination period drastically reduces value.
 
-#   Option 2 — Reduced daily benefit:
-#     Benefits: $25,475  |  Premiums: $18,251  |  Ratio: 140%
-#     → Still good value, slightly less than Option 1
-
-#   Option 3 — Reduced benefit period:
-#     Benefits: $25,148  |  Premiums: $19,027  |  Ratio: 132%
-#     → Decent value, lower than Options 1 and 2
-
-#   Option 4 — Longer elimination period (wait more days before benefits start):
-#     Benefits: $19,962  |  Premiums: $22,715  |  Ratio: 88% ❌ ONLY BELOW 100%
-#     → You pay MORE in premiums than you likely get back in benefits
-#     → Choosing a longer elimination period significantly reduces value
-
-#   Option 5 — Reduced paid-up (stop paying premiums, keep reduced benefit):
-#     Benefits: $4,856   |  Premiums: $0       |  Ratio: N/A (no ongoing cost)
-#     → No future premium burden, but much lower benefit protection
-
-# Key insights:
-#   • Option 1 (current) delivers the BEST benefit/cost ratio at 149%
-#   • Option 4 (longer elimination) is the ONLY option where premiums > benefits
-#   • Increasing the elimination period drastically reduces expected value
-#   • Option 5 suits people who cannot afford premiums but want some coverage
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 6. WHAT IS "ELIMINATION PERIOD"?
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# The elimination period is the number of days you must pay for your own
-# care BEFORE your LTC insurance starts paying.
-#   • 30-day elimination  → Fastest coverage, lower out-of-pocket risk
-#   • 60-day elimination  → Moderate wait
-#   • 90-day elimination  → Most common in the market
-#   • 180-day elimination → Very long wait, significantly reduces value (see Option 4 above)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Number of days you pay for your own care BEFORE insurance starts paying.
+#   • 30-day → Fastest coverage
+#   • 60-day → Moderate wait
+#   • 90-day → Most common
+#   • 180-day → Very long wait, reduces value significantly
+
 # 7. WHAT IS "INFLATION PROTECTION"?
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# LTC care costs rise every year. Inflation protection ensures your
-# benefit amount grows over time to keep up.
-#   • None          → Your benefit stays fixed; loses real value each year
-#   • 3% compound   → Benefit grows 3% per year (doubles in ~24 years)
-#   • 5% compound   → Benefit grows 5% per year (doubles in ~14 years) — strongest protection
-#   • CPI-linked    → Grows with inflation index, variable rate
+
+#   • None        → Benefit stays fixed; loses real value each year
+#   • 3% compound → Benefit doubles in ~24 years
+#   • 5% compound → Benefit doubles in ~14 years (strongest)
+#   • CPI-linked  → Grows with inflation index
 
 # Key insight: Without inflation protection, a $5,000/month benefit today
 # may only cover half the cost of care in 15-20 years.
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 8. POLICY TYPES EXPLAINED
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#   • Traditional    → Pure LTC coverage. If you stop paying, you lose everything.
-#                      No cash value. Lowest premiums typically.
-#   • Hybrid         → Combines LTC with life insurance or annuity.
-#                      Has cash/death benefit even if LTC never used.
-#                      Higher premiums but preserves value.
-#   • Annuity        → Lump-sum funded, generates LTC income stream.
-#                      No "use it or lose it" concern.
-#   • Chronic illness rider → Add-on to a life insurance policy.
-#                      Accesses death benefit early if chronically ill.
-#                      Less flexible than standalone LTC but cheaper.
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# DISCLAIMER
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# All data above is from the Tell Us The Odds official sample report.
-# This is educational information only — not financial, legal, or insurance advice.
-# Users should consult a licensed advisor before making any decisions.
+#   • Traditional         → Pure LTC. No cash value. Lowest premiums.
+#   • Hybrid              → LTC + life insurance. Has cash/death benefit.
+#   • Annuity             → Lump-sum funded, generates LTC income stream.
+#   • Chronic illness rider → Add-on to life policy. Cheaper but less flexible.
+
+# DISCLAIMER: Educational information only — not financial, legal, or insurance advice.
 # """
 
 # # ─────────────────────────────────────────────────────────────────────────────
 
 # _pending_name_request: dict[str, dict] = {}
+
 
 # @dataclass
 # class ChatMessage:
@@ -201,24 +156,19 @@
 
 
 # def _build_system_prompt(user_text: str, current_data: dict, missing_fields: list) -> str:
-#     """
-#     Builds the AI system prompt.
-#     REPORT_KNOWLEDGE is always injected so the AI can answer
-#     actuarial questions from the sample report at any point in the conversation.
-#     """
 #     if missing_fields:
 #         next_field = missing_fields[0]
 #         next_label = FIELD_LABELS[next_field]
 #         filled = len(REQUIRED_FIELDS) - len(missing_fields)
 
 #         validation_rules = {
-#             "age": "Must be between 18 and 100. If user gives something outside this range, reject it and ask again.",
-#             "premium": "Monthly premium for LTC insurance is typically $50 to $2,000/month. If user gives a value above $2,000 or below $10, ask: 'That seems unusual — is that your monthly amount, or could it be annual? Typical monthly premiums range from $50 to $1,500.'",
-#             "benefit_amount": "Daily/Monthly benefit amount is typically $1,000 to $15,000/month or $50 to $500/day. If user gives a value above $20,000, ask: 'Just to confirm — is that your daily or monthly benefit amount? Typical monthly benefits range from $1,000 to $15,000.'",
-#             "elimination_period": "Must be one of: 30 days, 60 days, 90 days, 180 days. If user gives something else, ask them to choose one of these options.",
-#             "inflation_protection": "Must be one of: None, 3% compound, 5% compound, CPI-linked. If user gives something else, ask them to choose one of these.",
-#             "policy_type": "Must be one of: Traditional, Hybrid, Annuity, Chronic illness rider. If user gives something else, ask them to choose one of these.",
-#             "name": "Must be a real person's name (2+ characters, letters only). Reject numbers or gibberish.",
+#             "age": "Must be between 18 and 100.",
+#             "premium": "Monthly premium is typically $50–$2,000/mo. If above $2,000 or below $10, ask for clarification.",
+#             "benefit_amount": "Typically $1,000–$15,000/mo or $50–$500/day. If above $20,000, confirm daily vs monthly.",
+#             "elimination_period": "Must be one of: 30 days, 60 days, 90 days, 180 days.",
+#             "inflation_protection": "Must be one of: None, 3% compound, 5% compound, CPI-linked.",
+#             "policy_type": "Must be one of: Traditional, Hybrid, Annuity, Chronic illness rider.",
+#             "name": "Must be a real person's name (2+ characters, letters only).",
 #         }
 
 #         validation_hint = validation_rules.get(next_field, "")
@@ -227,9 +177,7 @@
 
 # {REPORT_KNOWLEDGE}
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CURRENT INTAKE SESSION
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Progress: {filled}/{len(REQUIRED_FIELDS)} fields completed.
 # Currently collecting: {next_label}
 
@@ -239,24 +187,23 @@
 
 # INSTRUCTIONS:
 # 1. If the user asks ANY question about LTC insurance, claim probability, benefit/cost ratios,
-#    elimination period, inflation protection, policy types, or risk data — answer it FIRST
-#    using the KNOWLEDGE BASE above, then return to collecting {next_label}.
+#    elimination period, inflation protection, or policy types — answer it FIRST using the
+#    KNOWLEDGE BASE above, then return to collecting {next_label}.
 # 2. If the user is providing their policy data, validate it using the VALIDATION RULE above.
-# 3. If the value seems wrong or unusual, do NOT save it. Instead ask a clarifying question.
+# 3. If the value seems wrong or unusual, do NOT save it — ask a clarifying question.
 # 4. If the value is valid, confirm it briefly (1 line) and save using EXACTLY this format:
 #    SAVING: {{"{next_field}": "extracted_value"}}
-# 5. After SAVING line, ALWAYS ask for the next field on a new line.
+# 5. After SAVING, ALWAYS ask for the next field on a new line.
 # 6. Keep responses concise and professional.
-# 7. Always be warm and helpful — you represent Tell Us The Odds℠."""
+# 7. Always be warm and helpful — you represent Tell Us The Odds℠.
+# 8. NEVER mention any tabs, panels, or UI buttons. Everything happens through this chat."""
 
 #     else:
-#         # All fields collected — full Q&A mode with report knowledge
 #         summary = "\n".join([
 #             f"  • {FIELD_LABELS.get(k, k)}: {v}"
 #             for k, v in current_data.items() if v
 #         ])
 
-#         # Personalized insights based on user's actual data
 #         age = int(current_data.get("age", 0) or 0)
 #         inflation = current_data.get("inflation_protection", "None")
 #         elim = current_data.get("elimination_period", "90 days")
@@ -266,7 +213,6 @@
 #             elim_match = re.search(r'\d+', elim)
 #             elim_days = int(elim_match.group()) if elim_match else 90
 
-#             # Claim probability context for their age
 #             if age < 75:
 #                 personalized.append(
 #                     f"At age {age}, their LTC risk is still relatively low (~{max(0.4, round((age-70)*0.25, 1))}%/year), "
@@ -283,61 +229,55 @@
 #                     f"The most common claim scenario for this age group is 1-2 years of care."
 #                 )
 
-#             # Elimination period insight
 #             if elim_days == 180:
 #                 personalized.append(
-#                     "Their 180-day elimination period is the longest available — similar to Option 4 in the "
-#                     "benefit/cost analysis, where premiums can exceed expected benefits (88% ratio). "
-#                     "They should weigh whether a shorter elimination period makes more sense."
+#                     "Their 180-day elimination period is the longest available — similar to Option 4 "
+#                     "in the benefit/cost analysis, where premiums can exceed expected benefits (88% ratio)."
 #                 )
 #             elif elim_days <= 30:
 #                 personalized.append(
 #                     "Their 30-day elimination period gives fast coverage — similar to Option 1's strong 149% ratio."
 #                 )
 
-#             # Inflation insight
 #             if inflation == "None":
 #                 personalized.append(
 #                     "No inflation protection means their benefit amount stays fixed. "
-#                     "Given that LTC costs typically rise 3-5% per year, the real value of their coverage "
-#                     "will erode significantly over time."
+#                     "LTC costs typically rise 3-5% per year, eroding real coverage value significantly."
 #                 )
 #             elif "5%" in inflation:
 #                 personalized.append(
 #                     "Their 5% compound inflation protection is the strongest available — "
-#                     "their benefit doubles every ~14 years, keeping pace with rising care costs."
+#                     "benefit doubles every ~14 years, keeping pace with rising care costs."
 #                 )
 
 #         personalized_text = "\n".join(f"  → {p}" for p in personalized) if personalized else ""
 
 #         return f"""You are a professional Policy Analyst at Tell Us The Odds℠.
-# The user's policy intake form is COMPLETE. Your job now is to answer their questions
-# using both their personal policy data AND the actuarial knowledge base below.
+# The user's policy intake form is COMPLETE. Answer their questions using their personal
+# policy data AND the actuarial knowledge base below.
 
 # {REPORT_KNOWLEDGE}
 
-# USER'S POLICY DATA (collected)
-
+# USER'S POLICY DATA (collected):
 # {summary}
 
-# PERSONALIZED INSIGHTS FOR THIS USER
-
+# PERSONALIZED INSIGHTS FOR THIS USER:
 # {personalized_text}
 
 # The user said: "{user_text}"
 
 # INSTRUCTIONS:
-# 1. Answer their question using the KNOWLEDGE BASE and their personal policy data above.
-#    Always personalize your answer — reference their specific age, premium, benefit amount, etc.
-# 2. If they ask about claim probability, use their age to give a specific estimate from the data.
+# 1. Answer using the KNOWLEDGE BASE and their personal policy data. Always personalize —
+#    reference their specific age, premium, benefit amount, etc.
+# 2. If they ask about claim probability, use their age to give a specific estimate.
 # 3. If they ask about benefit/cost, relate it to their actual premium and benefit amount.
-# 4. If they ask "should I keep my policy?", reference both their data AND the Keep/Lapse/Sell
-#    analysis framework. Suggest they click "Analyze Policy" in the My Policy tab.
-# 5. If they ask about risk comparisons, use the death vs LTC data from the knowledge base.
-# 6. Always end with: suggest the 'My Policy' tab → 'Analyze Policy' for full decision analysis.
-# 7. Keep responses clear, warm, and educational — not financial advice.
-# 8. Always add: "This is educational guidance only — please consult a licensed advisor."
-# """
+# 4. If they ask "should I keep my policy?" or request analysis, give the Keep/Lapse/Sell
+#    framework directly in your response — do NOT tell them to go to any tab or panel.
+# 5. If they ask about risk, use the death vs LTC data from the knowledge base.
+# 6. Keep responses clear, warm, and educational — not financial advice.
+# 7. Always add: "This is educational guidance only — please consult a licensed advisor."
+# 8. NEVER mention any tabs, panels, buttons, or UI elements. Everything is through this chat.
+# 9. If they ask to start a new form or reset, tell them to type "start new form" to begin fresh."""
 
 
 # def _detect_fetch_field(text_lower: str) -> str | None:
@@ -371,6 +311,71 @@
 #     return f"I don't have your **{label}** yet. Could you share it?"
 
 
+# def _format_analysis_as_text(analysis: dict) -> str:
+#     """Convert the decision analysis dict into a readable chat message."""
+#     rec = analysis.get("recommended", "keep")
+#     final = analysis.get("final_answer", "")
+#     opts = analysis.get("options", {})
+#     disclaimer = analysis.get("disclaimer", "")
+
+#     lines = [f"**📊 Policy Decision Analysis**\n", f"**{final}**\n"]
+
+#     labels = {"keep": "✅ Stay Protected", "lapse": "⛔ Stop & Walk Away", "sell": "💰 Cash Out"}
+
+#     for key in ["keep", "lapse", "sell"]:
+#         opt = opts.get(key)
+#         if not opt:
+#             continue
+#         is_rec = key == rec
+#         star = " ⭐ RECOMMENDED" if is_rec else ""
+#         lines.append(f"**{labels[key]}{star}** — Score: {opt['score']}/100")
+#         lines.append(f"_{opt['summary']}_")
+#         for p in opt.get("pros", []):
+#             lines.append(f"  + {p}")
+#         for c in opt.get("cons", []):
+#             lines.append(f"  − {c}")
+#         lines.append("")
+
+#     lines.append(f"_{disclaimer}_")
+#     return "\n".join(lines)
+
+
+# def handle_reset_request(user_text: str, session_id: str, db: Session) -> str | None:
+#     text_lower = user_text.lower()
+#     if any(kw in text_lower for kw in RESET_KEYWORDS):
+#         new_version = crud.archive_and_new_version(db, session_id)
+#         return (
+#             f"✅ Your previous data has been saved to history (now archived).\n\n"
+#             f"A new blank form (version {new_version}) has been started!\n\n"
+#             "Let's begin — what is your **full name**?"
+#         )
+#     return None
+
+
+# def handle_analyze_request(user_text: str, session_id: str, db: Session) -> str | None:
+#     text_lower = user_text.lower()
+#     if not any(kw in text_lower for kw in ANALYZE_KEYWORDS):
+#         return None
+
+#     policy = crud.get_policy(db, session_id)
+#     if not policy:
+#         return "I don't have your policy details yet. Let's start your intake — what is your **full name**?"
+
+#     current_data = {k: getattr(policy, k) for k in REQUIRED_FIELDS if getattr(policy, k, None)}
+#     missing = [f for f in REQUIRED_FIELDS if f not in current_data]
+
+#     if missing:
+#         missing_labels = ", ".join(FIELD_LABELS[f] for f in missing)
+#         return (
+#             f"I need a few more details before I can analyze your policy.\n\n"
+#             f"Still needed: **{missing_labels}**\n\n"
+#             f"Could you share your **{FIELD_LABELS[missing[0]]}**?"
+#         )
+
+#     analysis = generate_decision_analysis(current_data)
+#     return _format_analysis_as_text(analysis)
+
+
 # def handle_fetch_request(user_text: str, session_id: str, db: Session) -> str | None:
 #     text_lower = user_text.lower()
 
@@ -380,10 +385,7 @@
 
 #         existing = crud.find_policy_by_name(db, entered_name)
 #         if existing:
-#             data = {
-#                 k: getattr(existing, k)
-#                 for k in REQUIRED_FIELDS if getattr(existing, k, None)
-#             }
+#             data = {k: getattr(existing, k) for k in REQUIRED_FIELDS if getattr(existing, k, None)}
 #             crud.upsert_policy(db, session_id, data)
 #             policy = crud.get_policy(db, session_id)
 #             answer = _answer_from_policy(policy, pending["field_key"])
@@ -397,17 +399,12 @@
 #     field_key = _detect_fetch_field(text_lower)
 
 #     if field_key is None:
-#         name_match = re.search(
-#             r"(?:my name is|i am|iam|this is)\s+([a-zA-Z\s]+)", text_lower
-#         )
+#         name_match = re.search(r"(?:my name is|i am|iam|this is)\s+([a-zA-Z\s]+)", text_lower)
 #         if name_match:
 #             extracted_name = name_match.group(1).strip()
 #             existing = crud.find_policy_by_name(db, extracted_name)
 #             if existing and existing.session_id != session_id:
-#                 data = {
-#                     k: getattr(existing, k)
-#                     for k in REQUIRED_FIELDS if getattr(existing, k, None)
-#                 }
+#                 data = {k: getattr(existing, k) for k in REQUIRED_FIELDS if getattr(existing, k, None)}
 #                 crud.upsert_policy(db, session_id, data)
 #                 return (
 #                     f"Welcome back **{extracted_name}**! "
@@ -419,10 +416,7 @@
 #     if policy:
 #         return _answer_from_policy(policy, field_key)
 
-#     _pending_name_request[session_id] = {
-#         "field_key":      field_key,
-#         "original_query": user_text,
-#     }
+#     _pending_name_request[session_id] = {"field_key": field_key, "original_query": user_text}
 #     return (
 #         "I don't have your details on file yet. "
 #         "Could you please tell me your **full name** so I can look up your records?"
@@ -435,10 +429,7 @@
 #     policy = crud.get_policy(db, session_id)
 #     current_data = {}
 #     if policy:
-#         current_data = {
-#             k: getattr(policy, k)
-#             for k in REQUIRED_FIELDS if getattr(policy, k, None)
-#         }
+#         current_data = {k: getattr(policy, k) for k in REQUIRED_FIELDS if getattr(policy, k, None)}
 
 #     missing_fields = [f for f in REQUIRED_FIELDS if f not in current_data]
 #     system_prompt = _build_system_prompt(user_text, current_data, missing_fields)
@@ -451,7 +442,7 @@
 #                 {"role": "user",   "content": user_text},
 #             ],
 #             temperature=0.4,
-#             max_tokens=700,  # increased — report answers need more space
+#             max_tokens=700,
 #         )
 #         raw = completion.choices[0].message.content
 #         clean = re.sub(r'<think>[\s\S]*?<\/think>', '', raw, flags=re.IGNORECASE).strip()
@@ -484,16 +475,13 @@
 #                 if k in REQUIRED_FIELDS and v
 #             }
 #             if data_to_save:
-#                 crud.upsert_policy(db, session_id, data_to_save)
+#                 crud.upsert_active_policy(db, session_id, data_to_save)
 #                 print(f"[PolicyForm] Saved to MySQL: {list(data_to_save.keys())}")
 
 #         policy = crud.get_policy(db, session_id)
 #         current_data = {}
 #         if policy:
-#             current_data = {
-#                 k: getattr(policy, k)
-#                 for k in REQUIRED_FIELDS if getattr(policy, k, None)
-#             }
+#             current_data = {k: getattr(policy, k) for k in REQUIRED_FIELDS if getattr(policy, k, None)}
 #         missing_fields = [f for f in REQUIRED_FIELDS if f not in current_data]
 
 #         if not clean_msg:
@@ -504,7 +492,14 @@
 #             filled = len(REQUIRED_FIELDS) - len(missing_fields)
 #             clean_msg += f"\n\n({filled}/{len(REQUIRED_FIELDS)} complete) Could you please share your **{next_label}**?"
 #         else:
-#             clean_msg += "\n\n✅ All details collected! Head to the **My Policy** tab to review or **Analyze** your policy."
+#             clean_msg += (
+#                 "\n\n✅ **All details collected!**\n\n"
+#                 "You can now:\n"
+#                 "• Type **\"analyze my policy\"** for a Keep / Lapse / Sell recommendation\n"
+#                 "• Ask any question about your coverage\n"
+#                 "• Type **\"show all my details\"** to review what's saved\n"
+#                 "• Type **\"start new form\"** to begin a fresh intake"
+#             )
 
 #         return clean_msg
 
@@ -513,12 +508,15 @@
 #         return raw_response.split("SAVING:")[0].strip()
 
 
-# def save_and_get_bot_response(
-#     user_text: str, session_id: str, db: Session
-# ) -> ChatMessage:
+# def save_and_get_bot_response(user_text: str, session_id: str, db: Session) -> ChatMessage:
 #     crud.save_message(db, session_id, "user", user_text)
 
-#     bot_text = handle_fetch_request(user_text, session_id, db)
+#     # Priority order: reset → analyze → fetch → AI
+#     bot_text = (
+#         handle_reset_request(user_text, session_id, db)
+#         or handle_analyze_request(user_text, session_id, db)
+#         or handle_fetch_request(user_text, session_id, db)
+#     )
 
 #     if not bot_text:
 #         raw_ai = get_ai_intake_response(user_text, session_id, db)
@@ -532,6 +530,7 @@
 #         created_at=saved.created_at,
 #         db_id=saved.id,
 #     )
+
 
 # def generate_decision_analysis(policy_data: dict) -> dict:
 #     age         = int(policy_data.get("age", 60))
@@ -574,10 +573,10 @@
 #     if age < 65:
 #         keep_score += 10
 #         keep_pros.append("You're younger — more years of protection ahead, premiums are still manageable")
-#     elif age >= 65 and age < 75:
+#     elif 65 <= age < 75:
 #         keep_score -= 5
 #         keep_cons.append("Review whether premiums remain affordable as you age")
-#     elif age >= 75 and age < 80:
+#     elif 75 <= age < 80:
 #         keep_score -= 15
 #         keep_cons.append("At 75+, premiums often rise sharply — carefully review affordability")
 #     elif age >= 80:
@@ -683,15 +682,15 @@
 #     lapse_score = max(0, min(100, lapse_score))
 #     sell_score  = max(0, min(100, sell_score))
 
-#     scores      = {"keep": keep_score, "lapse": lapse_score, "sell": sell_score}
-#     recommended = max(scores, key=scores.get)
-
 #     if premium < 50:
 #         lapse_score = max(0, lapse_score - 25)
 #         sell_score  = max(0, sell_score - 15)
 
 #     if age >= 85 and benefit < 2000:
 #         sell_score = max(0, sell_score - 20)
+
+#     scores      = {"keep": keep_score, "lapse": lapse_score, "sell": sell_score}
+#     recommended = max(scores, key=scores.get)
 
 #     option_labels = {
 #         "keep":  "Stay Protected",
@@ -700,8 +699,8 @@
 #     }
 
 #     final_answer = {
-#         "keep":  "Stay Protected is the best choice. Your coverage remains active and still offers value, especially with your current policy details.",
-#         "lapse": "Stop & Walk Away is the best choice. Your premium is relatively high and the policy may no longer be cost-effective for you.",
+#         "keep":  "Stay Protected is the best choice. Your coverage remains active and still offers value.",
+#         "lapse": "Stop & Walk Away is the best choice. Your premium is relatively high and the policy may no longer be cost-effective.",
 #         "sell":  "Cash Out is the best choice. Your policy is likely attractive to buyers and can free up a lump sum now.",
 #     }[recommended]
 
@@ -759,6 +758,8 @@ FIELD_LABELS = {
     "inflation_protection": "Inflation Protection (None / 3% compound / 5% compound / CPI-linked)",
 }
 
+# These keywords trigger a field-fetch lookup — but ONLY during intake (missing fields exist).
+# Once all fields are collected the AI handles everything; fetch keywords become ambiguous.
 FETCH_KEYWORDS = {
     "name":                ["name", "i am", "my name"],
     "age":                 ["age", "year old"],
@@ -1017,6 +1018,20 @@ INSTRUCTIONS:
 9. If they ask to start a new form or reset, tell them to type "start new form" to begin fresh."""
 
 
+def _is_intake_in_progress(session_id: str, db: Session) -> bool:
+    """
+    Returns True if the session still has missing required fields.
+    Used to guard fetch-keyword detection — we only run field-fetch
+    logic during active intake, not once all fields are collected.
+    """
+    policy = crud.get_policy(db, session_id)
+    if not policy:
+        return True  # No policy at all — intake hasn't started
+    current_data = {k: getattr(policy, k) for k in REQUIRED_FIELDS if getattr(policy, k, None)}
+    missing = [f for f in REQUIRED_FIELDS if f not in current_data]
+    return len(missing) > 0
+
+
 def _detect_fetch_field(text_lower: str) -> str | None:
     if any(w in text_lower for w in [
         "show all", "all details", "all data",
@@ -1114,8 +1129,15 @@ def handle_analyze_request(user_text: str, session_id: str, db: Session) -> str 
 
 
 def handle_fetch_request(user_text: str, session_id: str, db: Session) -> str | None:
+    """
+    Handle field-lookup requests. This is guarded so it only runs during active
+    intake (while fields are still missing). Once the form is complete, keyword
+    collisions (e.g. the user asking a general question containing "age" or
+    "premium") are handed off to the AI instead of wrongly triggering a fetch.
+    """
     text_lower = user_text.lower()
 
+    # --- Handle pending name lookup (cross-session restore) ---
     if session_id in _pending_name_request:
         pending = _pending_name_request.pop(session_id)
         entered_name = user_text.strip()
@@ -1132,6 +1154,21 @@ def handle_fetch_request(user_text: str, session_id: str, db: Session) -> str | 
                 f"I couldn't find any records for **{entered_name}**. "
                 "Let's start fresh — what is your full name to begin your intake?"
             )
+
+    # "Show all my details" is always valid regardless of intake state
+    if any(w in text_lower for w in [
+        "show all", "all details", "all data",
+        "everything", "full details", "badhu batavo", "my details", "my information",
+    ]):
+        policy = crud.get_policy(db, session_id)
+        if policy:
+            return _answer_from_policy(policy, "__all__")
+        return "Your policy form is empty. Let's fill it in — what is your **full name**?"
+
+    # --- Guard: only run keyword-based fetch during active intake ---
+    if not _is_intake_in_progress(session_id, db):
+        # Form is complete — let the AI handle all conversation naturally
+        return None
 
     field_key = _detect_fetch_field(text_lower)
 
