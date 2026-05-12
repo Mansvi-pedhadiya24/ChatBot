@@ -46,7 +46,12 @@ def get_history(db: Session, session_id: str, limit: int = 50):
     )
 
 def get_policy(db: Session, session_id: str) -> Optional[PolicyData]:
-    return db.query(PolicyData).filter(PolicyData.session_id == session_id).first()
+    return (
+        db.query(PolicyData)
+        .filter(PolicyData.session_id == session_id, PolicyData.is_active == True)
+        .order_by(PolicyData.version.desc())
+        .first()
+    )
 
 
 def upsert_policy(db: Session, session_id: str, fields: dict):

@@ -1,13 +1,19 @@
-import { Card } from "@/components/ui/card";
+import ReactMarkdown from "react-markdown";
 
-const formatText = (text) =>
-  String(text)
-    .split(/(\*\*[^*]+\*\*)/)
-    .map((part, i) =>
-      part.startsWith("**") && part.endsWith("**")
-        ? <strong key={i}>{part.slice(2, -2)}</strong>
-        : part
-    );
+const formatBotText = (text) => {
+  if (!text) return "";
+
+  const hasBullets = text.includes("•");
+
+  if (hasBullets) {
+    return text
+      .replace(/\s*•\s*/g, "\n• ") 
+      .replace(/^\n/, "")          
+      .trim();
+  }
+
+  return text;
+};
 
 export const Message = ({ msg, isUser }) => {
   return (
@@ -16,53 +22,69 @@ export const Message = ({ msg, isUser }) => {
       style={{
         display: "flex",
         justifyContent: isUser ? "flex-end" : "flex-start",
-        marginBottom: 12,
+        marginBottom: 10,
       }}
     >
-      <div style={{ maxWidth: "82%" }}>
+      <div
+        style={{
+          maxWidth: "80%",
+          padding: "10px 13px",
+          borderRadius: isUser
+            ? "16px 16px 4px 16px"
+            : "16px 16px 16px 4px",
+          background: isUser ? "var(--brand-navy)" : "#fff",
+          color: isUser ? "#fff" : "#1e293b",
+          fontSize: 13.5,
+          fontFamily: "'Open Sans', sans-serif",
+          border: isUser ? "none" : "1px solid #e2e8f0",
+          lineHeight: 1.55,
+        }}
+      >
         {isUser ? (
-          /* User bubble — no Card, just a styled div */
-          <div
-            style={{
-              padding: "11px 15px",
-              borderRadius: "14px 14px 3px 14px",
-              background: "#0f3460",
-              color: "#fff",
-              fontSize: 13.5,
-              lineHeight: 1.55,
-              whiteSpace: "pre-wrap",
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            {msg.text}
-          </div>
+          <span style={{ whiteSpace: "pre-wrap" }}>{msg.text}</span>
         ) : (
-          /* Bot bubble — shadcn Card */
-          <Card
-            style={{
-              padding: "11px 15px",
-              borderRadius: "14px 14px 14px 3px",
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
-              boxShadow: "none",
-              fontSize: 13.5,
-              lineHeight: 1.55,
-              color: "#1e293b",
-              whiteSpace: "pre-wrap",
-              fontFamily: "'DM Sans', sans-serif",
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p style={{ margin: "0 0 6px 0", whiteSpace: "pre-line" }}>
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong style={{ fontWeight: 600, color: "#0f3460" }}>
+                  {children}
+                </strong>
+              ),
+              ul: ({ children }) => (
+                <ul style={{ margin: "4px 0", paddingLeft: 18 }}>
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol style={{ margin: "4px 0", paddingLeft: 18 }}>
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li style={{ marginBottom: 3 }}>{children}</li>
+              ),
+              em: ({ children }) => (
+                <em style={{ color: "#64748b", fontStyle: "italic" }}>
+                  {children}
+                </em>
+              ),
             }}
           >
-            {formatText(msg.text)}
-          </Card>
+            {formatBotText(msg.text)}
+          </ReactMarkdown>
         )}
 
         <div
           style={{
             fontSize: 10,
-            color: "#94a3b8",
-            marginTop: 3,
-            textAlign: isUser ? "right" : "left",
-            fontFamily: "'DM Sans', sans-serif",
+            color: isUser ? "rgba(255,255,255,0.5)" : "#94a3b8",
+            marginTop: 4,
+            textAlign: "right",
           }}
         >
           {msg.timestamp}
