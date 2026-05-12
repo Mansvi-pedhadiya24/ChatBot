@@ -40,15 +40,15 @@ export const FloatingChatButton = ({ onClick, isOpen }) => {
         style={{
           position: "fixed", bottom: 24, right: 24,
           width: 56, height: 56, borderRadius: "50%",
-          background: "#0f3460", border: "none",
+          background: "#4886ff", border: "none",
           boxShadow: "0 6px 20px rgba(15,52,96,0.4)",
           zIndex: 9999, padding: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 22, color: "#fff",
           transition: "transform 0.2s, background 0.2s",
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.background = "#1a4a7a"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "#0f3460"; }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.background = "#4886ff"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "#4886ff"; }}
       >
         {isOpen ? "✕" : "💬"}
 
@@ -62,7 +62,7 @@ export const FloatingChatButton = ({ onClick, isOpen }) => {
               border: "2px solid #fff",
               fontSize: 8, fontWeight: 700, color: "#7a4e00",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Open Sans', sans-serif",
             }}
           >
             1
