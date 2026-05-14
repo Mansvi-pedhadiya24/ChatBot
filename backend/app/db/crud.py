@@ -5,7 +5,6 @@ from typing import Optional
 
 
 def _now() -> datetime:
-    """Return current UTC time. Single source of truth for all timestamps."""
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
@@ -92,7 +91,7 @@ def find_policy_by_name(db: Session, name: str) -> Optional[PolicyData]:
 
 
 def get_active_policy(db: Session, session_id: str) -> Optional[PolicyData]:
-    """Return the currently active (non-archived) policy for this session."""
+    
     return (
         db.query(PolicyData)
         .filter(PolicyData.session_id == session_id, PolicyData.is_active == True)
@@ -112,10 +111,7 @@ def get_all_policy_versions(db: Session, session_id: str):
 
 
 def upsert_active_policy(db: Session, session_id: str, data: dict) -> PolicyData:
-    """
-    Update fields on the active policy version.
-    If no active policy exists, create version 1.
-    """
+    
     policy = get_active_policy(db, session_id)
     if not policy:
         policy = PolicyData(
@@ -135,12 +131,7 @@ def upsert_active_policy(db: Session, session_id: str, data: dict) -> PolicyData
 
 
 def archive_and_new_version(db: Session, session_id: str) -> int:
-    """
-    Soft-reset:
-    1. Mark the current active policy as archived (is_active=False).
-    2. Create a new blank policy with version = old_version + 1, is_active=True.
-    Returns the new version number.
-    """
+
     current = get_active_policy(db, session_id)
 
     if current:
