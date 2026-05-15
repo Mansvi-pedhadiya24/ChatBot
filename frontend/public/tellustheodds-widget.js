@@ -1,28 +1,3 @@
-/**
- * ╔══════════════════════════════════════════════════════╗
- * ║   Tell Us The Odds℠  — Embeddable Chat Widget       ║
- * ║   Drop this script on ANY website. That's it.       ║
- * ╚══════════════════════════════════════════════════════╝
- *
- * USAGE — paste just before </body> on any page:
- *
- *   <script>
- *     window.TutoConfig = {
- *       wsUrl:   "ws://YOUR_SERVER_IP:8001",   // your FastAPI backend
- *       apiUrl:  "http://YOUR_SERVER_IP:8001", // same host, HTTP
- *       // optional:
- *       // position: "right"  | "left"          (default: "right")
- *       // theme:    "navy"   | "dark" | "gold"  (default: "navy")
- *       // label:    "Ask Us" | any string        (default: "Free to Ask")
- *     };
- *   </script>
- *   <script src="https://YOUR_CDN/tellustheodds-widget.js" defer></script>
- *
- * ─────────────────────────────────────────────────────
- * GitHub: https://github.com/YOUR_GITHUB/chatbot
- * ─────────────────────────────────────────────────────
- */
-
 (function (window, document) {
   "use strict";
 
@@ -95,7 +70,7 @@
 
     /* Widget panel */
     "#tuto-panel { position: fixed; bottom: 90px; " + cfg.position + ": 24px;",
-    "  width: 380px; max-width: calc(100vw - 48px); height: 580px; max-height: 85vh;",
+    "  width: 420px; max-width: calc(100vw - 48px); height: 580px; max-height: 85vh;",
     "  border-radius: 20px; overflow: hidden; display: none; flex-direction: column;",
     "  box-shadow: 0 24px 60px rgba(15,52,96,0.25), 0 4px 16px rgba(15,52,96,0.1);",
     "  border: 1px solid #e2e8f0; background: #fff; animation: tuto-pop .25s ease-out; }",
@@ -127,21 +102,48 @@
     "  border-radius: 20px; font-weight: 500; transition: background .15s; }",
     ".tuto-chip:hover { background: #eef2ff; }",
 
-    /* Messages */
-    "#tuto-messages { flex: 1; overflow-y: auto; padding: 16px 12px; background: #f8fafc; min-height: 0; }",
-    "#tuto-messages::-webkit-scrollbar { width: 4px; }",
-    "#tuto-messages::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }",
+    /* ════════════════════════════════════════════════════════════════ */
+    /* FIXED: Message bubbles - User message min-width issue resolved  */
+    /* ════════════════════════════════════════════════════════════════ */
+
+    /* Message wrapper */
     ".tuto-msg-wrap { display: flex; margin-bottom: 10px; animation: tuto-msgin .3s ease-out; width: 100%; overflow: hidden; }",
-    ".tuto-msg-wrap.user { justify-content: flex-end; padding-left: 24px; }",
-    ".tuto-msg-wrap.bot  { justify-content: flex-start; padding-right: 24px; }",
-    ".tuto-bubble { max-width: 75%; min-width: 0; word-break: break-word; overflow-wrap: break-word; padding: 10px 13px; font-size: 13px; line-height: 1.55; }",
-    ".tuto-bubble.user { background: " + T.primary + "; color: #fff;",
-    "  border-radius: 16px 16px 4px 16px; }",
+
+    /* User message wrapper - right aligned with proper padding */
+    ".tuto-msg-wrap.user { justify-content: flex-end; padding-left: 40px; }",
+
+    /* Bot message wrapper - left aligned */
+    ".tuto-msg-wrap.bot  { justify-content: flex-start; padding-right: 40px; }",
+
+    /* ═══ FIXED BUBBLE STYLES ═══ */
+    /* Base bubble */
+    ".tuto-bubble { max-width: 100%; word-break: break-word; overflow-wrap: break-word; padding: 10px 14px; font-size: 13px; line-height: 1.55; }",
+
+    /* ═══ USER BUBBLE FIX ═══ */
+    /* User bubble: proper min-width, fit-content width, inline-block display */
+    ".tuto-bubble.user { ",
+    "  background: " + T.primary + "; color: #fff;",
+    "  border-radius: 16px 16px 4px 16px;",
+    "  min-width: 60px;",                          /* FIXED: minimum width so short text doesn't shrink */
+    "  width: fit-content;",                       /* FIXED: width fits content but respects min-width */
+    "  display: inline-block;",                    /* FIXED: inline-block for proper width behavior */
+    "  flex-shrink: 0;",                           /* FIXED: don't shrink in flex container */
+    "  text-align: left;",                         /* FIXED: text stays left-aligned inside bubble */
+    "  box-shadow: 0 1px 2px rgba(0,0,0,0.1);",     /* subtle shadow for depth */
+    "}",
+
+    /* Bot bubble */
     ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
-    "  border: 1px solid #e2e8f0; border-radius: 16px 16px 16px 4px; }",
+    "  border: 1px solid #e2e8f0; border-radius: 16px 16px 16px 4px;",
+    "  width: 100%;",                              /* Bot takes full available width */
+    "}",
+
+    /* Timestamp */
     ".tuto-ts { font-size: 10px; margin-top: 4px; text-align: right; }",
-    ".tuto-bubble.user .tuto-ts { color: rgba(255,255,255,.5); }",
+    ".tuto-bubble.user .tuto-ts { color: rgba(255,255,255,.6); }",
     ".tuto-bubble.bot .tuto-ts  { color: #94a3b8; }",
+
+    /* Empty state */
     ".tuto-empty { text-align: center; color: #64748b; padding-top: 30%; }",
     ".tuto-empty .tuto-icon { font-size: 40px; margin-bottom: 10px; opacity: .4; }",
     ".tuto-empty p { font-size: 13px; font-weight: 500; }",
@@ -187,7 +189,10 @@
 
     /* Mobile responsive */
     "@media (max-width: 480px) {",
-    "  #tuto-panel { width: calc(100vw - 20px); " + cfg.position + ": -10px; height: 78vh; }",
+    "  #tuto-panel { width: calc(100vw - 20px); " + cfg.position + ": 10px; height: 78vh; }",
+    "  .tuto-msg-wrap.user { padding-left: 20px; }",
+    "  .tuto-msg-wrap.bot  { padding-right: 20px; }",
+    "  .tuto-bubble { max-width: 100%; }",
     "}",
   ].join("\n");
   document.head.appendChild(style);
