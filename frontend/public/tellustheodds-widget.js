@@ -109,7 +109,7 @@
     ".tuto-msg-wrap { display: flex; margin-bottom: 14px; animation: tuto-msgin .3s ease-out; padding: 0 4px; }",
     ".tuto-msg-wrap.user { justify-content: flex-end; }",
     ".tuto-msg-wrap.bot  { justify-content: flex-start; }",
-    ".tuto-bubble { max-width: 75%; padding: 12px 14px; font-size: 13px; line-height: 1.5; word-wrap: break-word; }",
+    ".tuto-bubble { max-width: 75%; padding: 16px 18px; font-size: 13px; line-height: 2.5; word-wrap: break-word; }",
     ".tuto-bubble.user { background: " + T.primary + "; color: #fff;",
     "  border-radius: 8px 8px 2px 8px; box-shadow: 0 2px 8px rgba(72, 134, 255, 0.15); }",
     ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
