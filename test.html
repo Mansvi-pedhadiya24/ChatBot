@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head><title>chat bot</title></head>
+
+<head>
+  <title>chat bot</title>
+</head>
+
 <body>
   <h1>Widget Test Page</h1>
 
-  <script>
+  <!-- <script>
     window.TutoConfig = {
       wsUrl:  "ws://127.0.0.1:8001",
       apiUrl: "http://127.0.0.1:8001",
     };
   </script>
+  <script src="https://chat-bot-three-sable.vercel.app/tellustheodds-widget.js" defer></script> -->
+  <script>
+    window.TutoConfig = {
+      wsUrl: "ws://YOUR_SERVER_IP:8001",
+      apiUrl: "http://YOUR_SERVER_IP:8001",
+      position: "right" | "left",          
+      theme:    "navy"  | "dark" | "gold" ,
+      label:    any                
+    };
+  </script>
+
   <script src="https://chat-bot-three-sable.vercel.app/tellustheodds-widget.js" defer></script>
+
+
 </body>
+
 </html>
