@@ -132,14 +132,14 @@
     ".tuto-chip:hover { background: #eef2ff; border-color: #a5b4fc; }",
 
     /* Messages */
-    "#tuto-messages { flex: 1; overflow-y: auto; padding: 20px 14px 20px 14px; background: #f8fafc; min-height: 0; overflow-x: hidden; }",
+    "#tuto-messages { flex: 1; overflow-y: auto; padding: 20px 8px 20px 8px; background: #f8fafc; min-height: 0; overflow-x: hidden; }",
     "#tuto-messages::-webkit-scrollbar { width: 4px; }",
     "#tuto-messages::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }",
-    ".tuto-msg-wrap { display: flex; margin-bottom: 14px; animation: tuto-msgin .3s ease-out; padding: 0 10px; }",
+    ".tuto-msg-wrap { display: flex; margin-bottom: 14px; animation: tuto-msgin .3s ease-out; padding: 0 4px; }",
     ".tuto-msg-wrap.user { justify-content: flex-end; }",
     ".tuto-msg-wrap.bot  { justify-content: flex-start; }",
     // આ સાથે replace કરો:
-    ".tuto-bubble { max-width: 75%; min-width: 0; padding: 12px 14px; font-size: 13px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }",
+    '.tuto-bubble { max-width: 75%; min-width: 60px; padding: 12px 14px; font-size: 13px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }',
     ".tuto-bubble.user { background: " + T.primary + "; color: #fff;",
     "  border-radius: 8px 8px 2px 8px; box-shadow: 0 2px 8px rgba(72, 134, 255, 0.15); margin-right: 6px; }",
     ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
