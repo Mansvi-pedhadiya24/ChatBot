@@ -1,36 +1,490 @@
-/**
- * ╔══════════════════════════════════════════════════════╗
- * ║   Tell Us The Odds℠  — Embeddable Chat Widget       ║
- * ║   Drop this script on ANY website. That's it.       ║
- * ╚══════════════════════════════════════════════════════╝
- *
- * USAGE — paste just before </body> on any page:
- *
- *   <script>
- *     window.TutoConfig = {
- *       wsUrl:   "ws://YOUR_SERVER_IP:8001",   // your FastAPI backend
- *       apiUrl:  "http://YOUR_SERVER_IP:8001", // same host, HTTP
- *       // optional:
- *       // position: "right"  | "left"          (default: "right")
- *       // theme:    "navy"   | "dark" | "gold"  (default: "navy")
- *       // label:    "Ask Us" | any string        (default: "Free to Ask")
- *     };
- *   </script>
- *   <script src="https://YOUR_CDN/tellustheodds-widget.js" defer></script>
- *
- * ─────────────────────────────────────────────────────
- * GitHub: https://github.com/YOUR_GITHUB/chatbot
- * ─────────────────────────────────────────────────────
- */
+// /**
+//  * ╔══════════════════════════════════════════════════════╗
+//  * ║   Tell Us The Odds℠  — Embeddable Chat Widget       ║
+//  * ║   Drop this script on ANY website. That's it.       ║
+//  * ╚══════════════════════════════════════════════════════╝
+//  *
+//  * USAGE — paste just before </body> on any page:
+//  *
+//  *   <script>
+//  *     window.TutoConfig = {
+//  *       wsUrl:   "ws://YOUR_SERVER_IP:8001",   // your FastAPI backend
+//  *       apiUrl:  "http://YOUR_SERVER_IP:8001", // same host, HTTP
+//  *       // optional:
+//  *       // position: "right"  | "left"          (default: "right")
+//  *       // theme:    "navy"   | "dark" | "gold"  (default: "navy")
+//  *       // label:    "Ask Us" | any string        (default: "Free to Ask")
+//  *     };
+//  *   </script>
+//  *   <script src="https://YOUR_CDN/tellustheodds-widget.js" defer></script>
+//  *
+//  * ─────────────────────────────────────────────────────
+//  * GitHub: https://github.com/YOUR_GITHUB/chatbot
+//  * ─────────────────────────────────────────────────────
+//  */
 
-(function (window, document) {
+// (function (window, document) {
+//   "use strict";
+
+//   /* ── 0. Guard against double-init ─────────────────────────────── */
+//   if (window.__TutoWidgetLoaded) return;
+//   window.__TutoWidgetLoaded = true;
+
+//   /* ── 1. Config (merge user settings with defaults) ────────────── */
+//   var cfg = Object.assign(
+//     {
+//       wsUrl:    "ws://192.168.0.245:8001",
+//       apiUrl:   "http://192.168.0.245:8001",
+//       position: "right",
+//       theme:    "navy",
+//       label:    "Free to Ask",
+//     },
+//     window.TutoConfig || {}
+//   );
+
+//   /* ── 2. Theme palettes ─────────────────────────────────────────── */
+//   var THEMES = {
+//     navy: { primary: "#4886ff", gold: "#f4f1e6", goldText: "#0f3460", bg: "#0f3460" },
+//     dark: { primary: "#1e293b", gold: "#c9a227", goldText: "#f5e9c0", bg: "#0f172a" },
+//     gold: { primary: "#c9a227", gold: "#0f3460", goldText: "#fff",    bg: "#92400e" },
+//   };
+//   var T = THEMES[cfg.theme] || THEMES.navy;
+
+//   /* ── 3. Session ID (persisted in localStorage) ────────────────── */
+//   function getSessionId() {
+//     var k = "tuto_session_id";
+//     var id = localStorage.getItem(k);
+//     if (!id) {
+//       id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+//       localStorage.setItem(k, id);
+//     }
+//     return id;
+//   }
+//   var SESSION_ID = getSessionId();
+
+//   /* ── 4. Inject CSS ────────────────────────────────────────────── */
+//   var style = document.createElement("style");
+//   style.textContent = [
+//     "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');",
+//     "#tuto-root * { box-sizing: border-box; font-family: 'DM Sans', 'Segoe UI', sans-serif; margin: 0; padding: 0; }",
+//     "#tuto-root { position: fixed; z-index: 2147483647; " + cfg.position + ": 24px; bottom: 24px; max-width: calc(100vw - 48px); }",
+
+//     /* FAB */
+//     "#tuto-fab { width: 58px; height: 58px; border-radius: 50%; background: " + T.primary + ";",
+//     "  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;",
+//     "  box-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: transform .2s, box-shadow .2s;",
+//     "  position: relative; }",
+//     "#tuto-fab:hover { transform: scale(1.09); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }",
+//     "#tuto-fab svg { width: 26px; height: 26px; fill: #fff; transition: opacity .2s; }",
+//     "#tuto-fab-close { display: none; font-size: 22px; color: #fff; line-height: 1; }",
+
+//     /* Badge */
+//     "#tuto-badge { position: absolute; top: 2px; right: 2px; width: 17px; height: 17px;",
+//     "  background: #c9a227; border: 2px solid #fff; border-radius: 50%;",
+//     "  font-size: 8px; font-weight: 700; color: #7a4e00;",
+//     "  display: flex; align-items: center; justify-content: center; }",
+
+//     /* Tooltip */
+//     "#tuto-tooltip { position: absolute; bottom: 68px; " + cfg.position + ": 0;",
+//     "  background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;",
+//     "  padding: 6px 14px; white-space: nowrap; font-size: 13px; color: #334155;",
+//     "  box-shadow: 0 4px 14px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px;",
+//     "  animation: tuto-pop .25s ease-out; }",
+//     "#tuto-tooltip-close { background: none; border: none; cursor: pointer; font-size: 11px;",
+//     "  color: #94a3b8; padding: 0; line-height: 1; }",
+
+//     /* Widget panel */
+//     "#tuto-panel { position: fixed; bottom: 90px; " + cfg.position + ": 24px;",
+//     "  width: 380px; max-width: calc(100vw - 48px); height: 580px; max-height: 85vh;",
+//     "  border-radius: 20px; overflow: hidden; display: none; flex-direction: column;",
+//     "  box-shadow: 0 24px 60px rgba(15,52,96,0.25), 0 4px 16px rgba(15,52,96,0.1);",
+//     "  border: 1px solid #e2e8f0; background: #fff; animation: tuto-pop .25s ease-out; }",
+//     "#tuto-panel.open { display: flex; }",
+
+//     /* Panel Header */
+//     "#tuto-header { background: " + T.primary + "; border-bottom: 2.5px solid " + T.gold + ";",
+//     "  padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }",
+//     "#tuto-logo { width: 34px; height: 34px; border-radius: 8px; background: " + T.gold + ";",
+//     "  display: flex; align-items: center; justify-content: center;",
+//     "  font-size: 16px; font-weight: 700; color: " + T.primary + "; flex-shrink: 0; }",
+//     "#tuto-header-text { margin-left: 10px; flex: 1; }",
+//     "#tuto-title { color: #fff; font-weight: 600; font-size: 14px; }",
+//     "#tuto-subtitle { font-size: 9px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 1px; }",
+//     "#tuto-status { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.1);",
+//     "  border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 4px 10px; }",
+//     "#tuto-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }",
+//     "#tuto-status-label { font-size: 9px; color: rgba(255,255,255,.8); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }",
+
+//     /* Info bar */
+//     "#tuto-infobar { background: #eff6ff; border-bottom: 1px solid #bfdbfe; padding: 5px 14px;",
+//     "  font-size: 11px; color: #1d4ed8; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }",
+
+//     /* Quick chips */
+//     "#tuto-chips { padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 6px;",
+//     "  background: #fafbfc; border-bottom: 1px solid #f0f2f5; flex-shrink: 0; }",
+//     ".tuto-chip { cursor: pointer; font-size: 11px; padding: 5px 11px;",
+//     "  border: 1px solid #c7d2fe; background: #fff; color: #3730a3;",
+//     "  border-radius: 20px; font-weight: 500; transition: background .15s; }",
+//     ".tuto-chip:hover { background: #eef2ff; }",
+
+//     /* Messages */
+//     "#tuto-messages { flex: 1; overflow-y: auto; padding: 16px 12px; background: #f8fafc; min-height: 0; }",
+//     "#tuto-messages::-webkit-scrollbar { width: 4px; }",
+//     "#tuto-messages::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }",
+//     ".tuto-msg-wrap { display: flex; margin-bottom: 10px; animation: tuto-msgin .3s ease-out; width: 100%; overflow: hidden; }",
+//     ".tuto-msg-wrap.user { justify-content: flex-end; padding-left: 24px; }",
+//     ".tuto-msg-wrap.bot  { justify-content: flex-start; padding-right: 24px; }",
+//     ".tuto-bubble { max-width: 75%; min-width: 0; word-break: break-word; overflow-wrap: break-word; padding: 10px 13px; font-size: 13px; line-height: 1.55; }",
+//     ".tuto-bubble.user { background: " + T.primary + "; color: #fff;",
+//     "  border-radius: 16px 16px 4px 16px; }",
+//     ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
+//     "  border: 1px solid #e2e8f0; border-radius: 16px 16px 16px 4px; }",
+//     ".tuto-ts { font-size: 10px; margin-top: 4px; text-align: right; }",
+//     ".tuto-bubble.user .tuto-ts { color: rgba(255,255,255,.5); }",
+//     ".tuto-bubble.bot .tuto-ts  { color: #94a3b8; }",
+//     ".tuto-empty { text-align: center; color: #64748b; padding-top: 30%; }",
+//     ".tuto-empty .tuto-icon { font-size: 40px; margin-bottom: 10px; opacity: .4; }",
+//     ".tuto-empty p { font-size: 13px; font-weight: 500; }",
+
+//     /* Typing dots */
+//     "#tuto-typing { display: none; justify-content: flex-start; margin-bottom: 10px; }",
+//     "#tuto-typing.show { display: flex; }",
+//     ".tuto-typing-bubble { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px 14px 14px 3px;",
+//     "  padding: 12px 16px; display: inline-flex; gap: 5px; align-items: center; }",
+//     ".tuto-dot-anim { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;",
+//     "  animation: tuto-bounce 1.1s infinite; }",
+
+//     /* Input area */
+//     "#tuto-input-area { padding: 10px 12px; background: #fff; border-top: 1px solid #e2e8f0;",
+//     "  display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }",
+//     "#tuto-textarea { flex: 1; resize: none; border-radius: 10px; font-size: 13px;",
+//     "  min-height: 40px; max-height: 96px; padding: 10px 13px;",
+//     "  border: 1px solid #e2e8f0; background: #fafbfc; color: #1e293b;",
+//     "  outline: none; transition: border-color .15s; font-family: inherit; }",
+//     "#tuto-textarea:focus { border-color: " + T.primary + "; }",
+//     "#tuto-send { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;",
+//     "  background: " + T.primary + "; border: none; color: #fff; font-size: 16px;",
+//     "  cursor: pointer; transition: background .15s, transform .1s; }",
+//     "#tuto-send:disabled { background: #cbd5e0; cursor: not-allowed; }",
+//     "#tuto-send:not(:disabled):hover { transform: scale(1.05); }",
+
+//     /* Disconnect banner */
+//     "#tuto-disconnected { display: none; padding: 6px 12px; background: #fef2f2;",
+//     "  border-top: 1px solid #fecaca; font-size: 11px; color: #b91c1c;",
+//     "  text-align: center; flex-shrink: 0; }",
+//     "#tuto-disconnected.show { display: block; }",
+
+//     /* Footer */
+//     "#tuto-footer { padding: 6px; text-align: center; font-size: 10px; color: #94a3b8;",
+//     "  background: #fafbfc; border-top: 1px solid #f1f5f9; flex-shrink: 0; }",
+//     "#tuto-footer a { color: #94a3b8; text-decoration: none; }",
+//     "#tuto-footer a:hover { color: " + T.primary + "; }",
+
+//     /* Animations */
+//     "@keyframes tuto-pop { from { opacity:0; transform:scale(.88); } to { opacity:1; transform:scale(1); } }",
+//     "@keyframes tuto-msgin { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }",
+//     "@keyframes tuto-bounce { 0%,80%,100% { transform:scale(.75); opacity:.3; } 40% { transform:scale(1.1); opacity:1; } }",
+
+//     /* Mobile responsive */
+//     "@media (max-width: 480px) {",
+//     "  #tuto-panel { width: calc(100vw - 20px); " + cfg.position + ": -10px; height: 78vh; }",
+//     "}",
+//   ].join("\n");
+//   document.head.appendChild(style);
+
+//   /* ── 5. Build DOM ──────────────────────────────────────────────── */
+//   var QUICK = [
+//     "Start my intake form",
+//     "What is my claim probability?",
+//     "What does elimination period mean?",
+//     "How does inflation protection work?",
+//   ];
+
+//   var root = document.createElement("div");
+//   root.id = "tuto-root";
+//   root.innerHTML = [
+//     /* Tooltip */
+//     '<div id="tuto-tooltip">',
+//     '  <span>' + cfg.label + '</span>',
+//     '  <button id="tuto-tooltip-close" title="Dismiss">✕</button>',
+//     '</div>',
+
+//     /* FAB */
+//     '<button id="tuto-fab" aria-label="Open chat">',
+//     '  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+//     '    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>',
+//     '  </svg>',
+//     '  <span id="tuto-fab-close">✕</span>',
+//     '  <span id="tuto-badge">1</span>',
+//     '</button>',
+
+//     /* Panel */
+//     '<div id="tuto-panel" role="dialog" aria-label="Chat">',
+
+//     /* Header */
+//     '  <div id="tuto-header">',
+//     '    <div id="tuto-logo">T</div>',
+//     '    <div id="tuto-header-text">',
+//     '      <div id="tuto-title">Tell Us The Odds℠</div>',
+//     '      <div id="tuto-subtitle">Valuation Services</div>',
+//     '    </div>',
+//     '    <div id="tuto-status">',
+//     '      <span id="tuto-dot"></span>',
+//     '      <span id="tuto-status-label">Connecting</span>',
+//     '    </div>',
+//     '  </div>',
+
+//     /* Info bar */
+//     '  <div id="tuto-infobar">ℹ️ Educational guidance only — not financial or legal advice.</div>',
+
+//     /* Chips */
+//     '  <div id="tuto-chips">',
+//     QUICK.map(function(q) {
+//       return '<button class="tuto-chip" data-q="' + q.replace(/"/g, "&quot;") + '">' + q + '</button>';
+//     }).join(""),
+//     '  </div>',
+
+//     /* Messages */
+//     '  <div id="tuto-messages">',
+//     '    <div class="tuto-empty" id="tuto-empty">',
+//     '      <div class="tuto-icon">📝</div>',
+//     '      <p>How can we help with your<br>policy analysis today?</p>',
+//     '    </div>',
+//     '    <div id="tuto-typing">',
+//     '      <div class="tuto-typing-bubble">',
+//     '        <span class="tuto-dot-anim" style="animation-delay:0s"></span>',
+//     '        <span class="tuto-dot-anim" style="animation-delay:.18s"></span>',
+//     '        <span class="tuto-dot-anim" style="animation-delay:.36s"></span>',
+//     '      </div>',
+//     '    </div>',
+//     '  </div>',
+
+//     /* Input */
+//     '  <div id="tuto-input-area">',
+//     '    <textarea id="tuto-textarea" rows="1" placeholder="Type your message…" disabled></textarea>',
+//     '    <button id="tuto-send" disabled>➤</button>',
+//     '  </div>',
+
+//     /* Disconnect */
+//     '  <div id="tuto-disconnected">⚠️ Disconnected — reconnecting…</div>',
+
+//     /* Footer */
+//     '  <div id="tuto-footer">',
+//     '    Sutter\'s Mill Valuation Services &nbsp;|&nbsp;',
+//     '    <a href="https://tellustheodds.com" target="_blank" rel="noopener">tellustheodds.com</a>',
+//     '  </div>',
+
+//     '</div>', /* end panel */
+//   ].join("");
+
+//   document.body.appendChild(root);
+
+//   /* ── 6. Element refs ───────────────────────────────────────────── */
+//   var $fab       = document.getElementById("tuto-fab");
+//   var $fabClose  = document.getElementById("tuto-fab-close");
+//   var $fabSvg    = $fab.querySelector("svg");
+//   var $badge     = document.getElementById("tuto-badge");
+//   var $tooltip   = document.getElementById("tuto-tooltip");
+//   var $ttClose   = document.getElementById("tuto-tooltip-close");
+//   var $panel     = document.getElementById("tuto-panel");
+//   var $msgs      = document.getElementById("tuto-messages");
+//   var $empty     = document.getElementById("tuto-empty");
+//   var $typing    = document.getElementById("tuto-typing");
+//   var $chips     = document.getElementById("tuto-chips");
+//   var $dot       = document.getElementById("tuto-dot");
+//   var $statusLbl = document.getElementById("tuto-status-label");
+//   var $textarea  = document.getElementById("tuto-textarea");
+//   var $send      = document.getElementById("tuto-send");
+//   var $discon    = document.getElementById("tuto-disconnected");
+
+//   var isOpen      = false;
+//   var msgCount    = 0;
+
+//   /* ── 7. Open / close ───────────────────────────────────────────── */
+//   function openPanel() {
+//     isOpen = true;
+//     $panel.classList.add("open");
+//     $fabSvg.style.display  = "none";
+//     $fabClose.style.display = "block";
+//     $badge.style.display   = "none";
+//     $tooltip.style.display = "none";
+//     $textarea.focus();
+//     scrollBottom();
+//   }
+//   function closePanel() {
+//     isOpen = false;
+//     $panel.classList.remove("open");
+//     $fabSvg.style.display  = "block";
+//     $fabClose.style.display = "none";
+//   }
+
+//   $fab.addEventListener("click", function() {
+//     isOpen ? closePanel() : openPanel();
+//   });
+//   $ttClose.addEventListener("click", function(e) {
+//     e.stopPropagation();
+//     $tooltip.style.display = "none";
+//   });
+
+//   /* ── 8. Scroll helper ──────────────────────────────────────────── */
+//   function scrollBottom() {
+//     setTimeout(function() { $msgs.scrollTop = $msgs.scrollHeight; }, 50);
+//   }
+
+//   /* ── 9. Render a message bubble ────────────────────────────────── */
+//   function addMessage(text, type, ts) {
+//     msgCount++;
+//     if (msgCount === 1) {
+//       $empty.style.display = "none";
+//       $chips.style.display = "none";
+//     }
+//     var wrap = document.createElement("div");
+//     wrap.className = "tuto-msg-wrap " + type;
+//     var bubble = document.createElement("div");
+//     bubble.className = "tuto-bubble " + type;
+//     // Simple markdown: bold **x** and newlines
+//     var html = text
+//       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+//       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+//       .replace(/\n/g, "<br>");
+//     bubble.innerHTML = html + '<div class="tuto-ts">' + (ts || now()) + '</div>';
+//     wrap.appendChild(bubble);
+//     $msgs.insertBefore(wrap, $typing);
+//     scrollBottom();
+//   }
+
+//   function now() {
+//     return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+//   }
+
+//   /* ── 10. Status indicator ──────────────────────────────────────── */
+//   var STATUS_COLORS = { connected: "#22c55e", connecting: "#eab308", disconnected: "#ef4444", error: "#ef4444" };
+//   function setStatus(s) {
+//     $dot.style.background = STATUS_COLORS[s] || "#ef4444";
+//     $statusLbl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+//     var conn = s === "connected";
+//     $textarea.disabled = !conn;
+//     $send.disabled = !conn || !$textarea.value.trim();
+//     if (s === "disconnected" || s === "error") {
+//       $discon.classList.add("show");
+//     } else {
+//       $discon.classList.remove("show");
+//     }
+//   }
+
+//   /* ── 11. WebSocket ─────────────────────────────────────────────── */
+//   var ws, reconnectTimer;
+
+//   function connect() {
+//     setStatus("connecting");
+//     var url = cfg.wsUrl + "/ws/chat?session_id=" + SESSION_ID;
+//     ws = new WebSocket(url);
+
+//     ws.onopen = function() { setStatus("connected"); };
+
+//     ws.onmessage = function(e) {
+//       var data;
+//       try { data = JSON.parse(e.data); } catch(ex) { return; }
+
+//       if (data.type === "history") {
+//         (data.messages || []).forEach(function(m) {
+//           var t = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) : "";
+//           addMessage(m.content || m.text || "", m.sender === "user" ? "user" : "bot", t);
+//         });
+//         return;
+//       }
+//       if (data.type === "bot") {
+//         $typing.classList.remove("show");
+//         addMessage(data.text || "", "bot", data.timestamp || "");
+//       }
+//     };
+
+//     ws.onerror = function() { setStatus("error"); };
+//     ws.onclose = function() {
+//       setStatus("disconnected");
+//       clearTimeout(reconnectTimer);
+//       reconnectTimer = setTimeout(connect, 3000);
+//     };
+//   }
+
+//   /* ── 12. Firebase typing listener (optional, graceful fallback) ── */
+//   // If Firebase SDK isn't on the page, typing indicator still works
+//   // via a simple timeout after user sends.
+//   var typingTimeout;
+//   function showTyping() {
+//     $typing.classList.add("show");
+//     scrollBottom();
+//     clearTimeout(typingTimeout);
+//     typingTimeout = setTimeout(function() {
+//       $typing.classList.remove("show");
+//     }, 15000); // safety fallback
+//   }
+
+//   /* ── 13. Send message ──────────────────────────────────────────── */
+//   function sendMessage(text) {
+//     if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+//     addMessage(text, "user", now());
+//     showTyping();
+//     ws.send(JSON.stringify({
+//       text:       text,
+//       session_id: SESSION_ID,
+//       timestamp:  now(),
+//     }));
+//     // When bot responds, typing is hidden in ws.onmessage
+//   }
+
+//   /* ── 14. Input listeners ───────────────────────────────────────── */
+//   $textarea.addEventListener("input", function() {
+//     $send.disabled = !this.value.trim() || !ws || ws.readyState !== WebSocket.OPEN;
+//     // Auto-grow
+//     this.style.height = "auto";
+//     this.style.height = Math.min(this.scrollHeight, 96) + "px";
+//   });
+
+//   $textarea.addEventListener("keydown", function(e) {
+//     if (e.key === "Enter" && !e.shiftKey) {
+//       e.preventDefault();
+//       var text = $textarea.value.trim();
+//       if (text) { $textarea.value = ""; $textarea.style.height = "auto"; $send.disabled = true; sendMessage(text); }
+//     }
+//   });
+
+//   $send.addEventListener("click", function() {
+//     var text = $textarea.value.trim();
+//     if (text) { $textarea.value = ""; $textarea.style.height = "auto"; $send.disabled = true; sendMessage(text); }
+//   });
+
+//   /* ── 15. Quick chips ───────────────────────────────────────────── */
+//   $chips.addEventListener("click", function(e) {
+//     var chip = e.target.closest(".tuto-chip");
+//     if (chip) sendMessage(chip.dataset.q);
+//   });
+
+//   /* ── 16. Keyboard accessibility ────────────────────────────────── */
+//   document.addEventListener("keydown", function(e) {
+//     if (e.key === "Escape" && isOpen) closePanel();
+//   });
+
+//   /* ── 17. Boot ──────────────────────────────────────────────────── */
+//   connect();
+
+//   /* ── 18. Public API (window.TutoWidget) ────────────────────────── */
+//   window.TutoWidget = {
+//     open:  openPanel,
+//     close: closePanel,
+//     send:  sendMessage,
+//   };
+
+// })(window, document);
+
+
+(function (win, doc) {
   "use strict";
 
-  /* ── 0. Guard against double-init ─────────────────────────────── */
-  if (window.__TutoWidgetLoaded) return;
-  window.__TutoWidgetLoaded = true;
+  if (win.__TutoWidgetLoaded) return;
+  win.__TutoWidgetLoaded = true;
 
-  /* ── 1. Config ────────────────────────────────────────────────── */
+  /* ─── 1. Config ─────────────────────────────────────────────── */
   var cfg = Object.assign(
     {
       wsUrl:    "ws://192.168.0.245:8001",
@@ -39,19 +493,18 @@
       theme:    "navy",
       label:    "Free to Ask",
     },
-    window.TutoConfig || {}
+    win.TutoConfig || {}
   );
 
-  /* ── 2. Theme palettes ─────────────────────────────────────────── */
   var THEMES = {
-    navy: { primary: "#4886ff", gold: "#f4f1e6", goldText: "#0f3460", bg: "#0f3460" },
-    dark: { primary: "#1e293b", gold: "#c9a227", goldText: "#f5e9c0", bg: "#0f172a" },
-    gold: { primary: "#c9a227", gold: "#0f3460", goldText: "#fff",    bg: "#92400e" },
+    navy: { primary: "#4886ff", gold: "#f4f1e6" },
+    dark: { primary: "#1e293b", gold: "#c9a227" },
+    gold: { primary: "#c9a227", gold: "#0f3460" },
   };
-  var T = THEMES[cfg.theme] || THEMES.navy;
-  var POS = cfg.position; // "right" or "left"
+  var T   = THEMES[cfg.theme] || THEMES.navy;
+  var POS = cfg.position === "left" ? "left" : "right";
 
-  /* ── 3. Session ID ────────────────────────────────────────────── */
+  /* ─── 2. Session ID ─────────────────────────────────────────── */
   function getSessionId() {
     var k = "tuto_session_id";
     var id = localStorage.getItem(k);
@@ -63,242 +516,214 @@
   }
   var SESSION_ID = getSessionId();
 
-  /* ── 4. Inject CSS ────────────────────────────────────────────── */
-  var style = document.createElement("style");
-  style.textContent = [
-    /* DM Sans font — matches React app */
-    "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');",
+  /* ─── 3. DM Sans font ───────────────────────────────────────── */
+  if (!doc.getElementById("tuto-font")) {
+    var lnk = doc.createElement("link");
+    lnk.id   = "tuto-font";
+    lnk.rel  = "stylesheet";
+    lnk.href = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap";
+    doc.head.appendChild(lnk);
+  }
 
-    /* Reset */
-    "#tuto-root * { box-sizing: border-box; font-family: 'DM Sans', 'Segoe UI', sans-serif; margin: 0; padding: 0; }",
-
-    /* Root anchor */
-    "#tuto-root { position: fixed; z-index: 2147483647; " + POS + ": 24px; bottom: 24px; max-width: calc(100vw - 48px); }",
-
-    /* ── FAB ── */
-    "#tuto-fab {",
-    "  width: 58px; height: 58px; border-radius: 50%;",
-    "  background: " + T.primary + ";",
-    "  border: none; cursor: pointer;",
-    "  display: flex; align-items: center; justify-content: center;",
-    "  box-shadow: 0 8px 24px rgba(0,0,0,0.3);",
-    "  transition: transform .2s, box-shadow .2s;",
-    "  position: relative;",
-    "}",
-    "#tuto-fab:hover { transform: scale(1.09); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }",
-    "#tuto-fab svg { width: 26px; height: 26px; fill: #fff; }",
-    "#tuto-fab-close { display: none; font-size: 22px; color: #fff; line-height: 1; }",
-
-    /* Badge */
-    "#tuto-badge {",
-    "  position: absolute; top: 2px; right: 2px;",
-    "  width: 17px; height: 17px;",
-    "  background: #c9a227; border: 2px solid #fff; border-radius: 50%;",
-    "  font-size: 8px; font-weight: 700; color: #7a4e00;",
-    "  display: flex; align-items: center; justify-content: center;",
+  /* ─── 4. Scoped CSS  (all !important so host styles can't win) ─ */
+  var p = T.primary, g = T.gold;
+  var CSS = [
+    /* box-sizing + font reset — scoped to widget only */
+    "#tuto-root,#tuto-panel,",
+    "#tuto-root *,#tuto-panel *{",
+    "  box-sizing:border-box!important;",
+    "  font-family:'DM Sans','Segoe UI',sans-serif!important;",
+    "  margin:0!important;padding:0!important;",
     "}",
 
-    /* Tooltip */
-    "#tuto-tooltip {",
-    "  position: absolute; bottom: 68px; " + POS + ": 0;",
-    "  background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;",
-    "  padding: 6px 14px; white-space: nowrap; font-size: 13px; color: #334155;",
-    "  box-shadow: 0 4px 14px rgba(0,0,0,0.1);",
-    "  display: flex; align-items: center; gap: 8px;",
-    "  animation: tuto-pop .25s ease-out;",
-    "}",
-    "#tuto-tooltip-close {",
-    "  background: none; border: none; cursor: pointer;",
-    "  font-size: 11px; color: #94a3b8; padding: 0; line-height: 1;",
+    /* FAB anchor */
+    "#tuto-root{",
+    "  position:fixed!important;z-index:2147483647!important;",
+    "  " + POS + ":24px!important;bottom:24px!important;",
+    "  width:58px!important;height:58px!important;",
     "}",
 
-    /* Widget panel */
-    "#tuto-panel { position: fixed; bottom: 90px; " + cfg.position + ": 24px;",
-    "  width: 420px; max-width: calc(100vw - 48px); height: 580px; max-height: 85vh;",
-    "  border-radius: 20px; overflow: hidden; display: none; flex-direction: column;",
-    "  box-shadow: 0 24px 60px rgba(15,52,96,0.25), 0 4px 16px rgba(15,52,96,0.1);",
-    "  border: 1px solid #e2e8f0; background: #fff;",
-    "  animation: tuto-pop .25s ease-out;",
+    /* FAB */
+    "#tuto-fab{",
+    "  position:relative!important;",
+    "  width:58px!important;height:58px!important;border-radius:50%!important;",
+    "  background:" + p + "!important;",
+    "  border:none!important;cursor:pointer!important;",
+    "  display:flex!important;align-items:center!important;justify-content:center!important;",
+    "  box-shadow:0 8px 24px rgba(0,0,0,.30)!important;",
+    "  transition:transform .2s,box-shadow .2s!important;",
+    "  outline:none!important;",
     "}",
-    "#tuto-panel.open { display: flex; }",
+    "#tuto-fab:hover{transform:scale(1.09)!important;box-shadow:0 12px 32px rgba(0,0,0,.40)!important;}",
+    "#tuto-fab svg{width:26px!important;height:26px!important;fill:#fff!important;display:block!important;}",
+    "#tuto-fab-x{display:none!important;font-size:22px!important;color:#fff!important;line-height:1!important;}",
 
-    /* ── Header ── */
-    "#tuto-header {",
-    "  background: " + T.primary + ";",
-    "  border-bottom: 2.5px solid " + T.gold + ";",
-    "  padding: 13px 16px;",
-    "  display: flex; align-items: center; justify-content: space-between;",
-    "  flex-shrink: 0;",
-    "}",
-    "#tuto-logo {",
-    "  width: 34px; height: 34px; border-radius: 8px;",
-    "  background: " + T.gold + ";",
-    "  display: flex; align-items: center; justify-content: center;",
-    "  font-size: 16px; font-weight: 700; color: " + T.primary + ";",
-    "  flex-shrink: 0;",
-    "}",
-    "#tuto-header-text { margin-left: 10px; flex: 1; }",
-    "#tuto-title { color: #fff; font-weight: 600; font-size: 14px; }",
-    "#tuto-subtitle {",
-    "  font-size: 9px; color: rgba(255,255,255,.5);",
-    "  text-transform: uppercase; letter-spacing: 1.2px; margin-top: 1px;",
+    /* badge */
+    "#tuto-badge{",
+    "  position:absolute!important;top:2px!important;right:2px!important;",
+    "  width:17px!important;height:17px!important;",
+    "  background:#c9a227!important;border:2px solid #fff!important;border-radius:50%!important;",
+    "  font-size:8px!important;font-weight:700!important;color:#7a4e00!important;",
+    "  display:flex!important;align-items:center!important;justify-content:center!important;",
     "}",
 
-    /* Status pill — matches React StatusDot component */
-    "#tuto-status {",
-    "  display: flex; align-items: center; gap: 5px;",
-    "  background: rgba(255,255,255,.1);",
-    "  border: 1px solid rgba(255,255,255,.15);",
-    "  border-radius: 20px; padding: 4px 10px;",
+    /* tooltip */
+    "#tuto-tip{",
+    "  position:absolute!important;bottom:68px!important;" + POS + ":0!important;",
+    "  background:#fff!important;border:1px solid #e2e8f0!important;border-radius:20px!important;",
+    "  padding:6px 14px!important;white-space:nowrap!important;font-size:13px!important;color:#334155!important;",
+    "  box-shadow:0 4px 14px rgba(0,0,0,.10)!important;",
+    "  display:flex!important;align-items:center!important;gap:8px!important;",
+    "  animation:tuto-pop .25s ease-out;",
     "}",
-    "#tuto-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }",
-    "#tuto-status-label {",
-    "  font-size: 9px; color: rgba(255,255,255,.8);",
-    "  font-weight: 500; text-transform: uppercase; letter-spacing: .5px;",
+    "#tuto-tip-x{background:none!important;border:none!important;cursor:pointer!important;font-size:11px!important;color:#94a3b8!important;}",
+
+    /* ── Panel ── */
+    "#tuto-panel{",
+    "  position:fixed!important;",
+    "  " + POS + ":24px!important;bottom:90px!important;",
+    "  width:380px!important;max-width:calc(100vw - 48px)!important;",
+    "  height:580px!important;max-height:85vh!important;",
+    "  border-radius:20px!important;overflow:hidden!important;",
+    "  display:none!important;flex-direction:column!important;",
+    "  box-shadow:0 24px 60px rgba(15,52,96,.25),0 4px 16px rgba(15,52,96,.10)!important;",
+    "  border:1px solid #e2e8f0!important;background:#fff!important;",
+    "  animation:tuto-pop .25s ease-out;",
+    "  z-index:2147483646!important;",
     "}",
+    "#tuto-panel.open{display:flex!important;}",
 
-    /* ── Info bar ── */
-    "#tuto-infobar {",
-    "  background: #eff6ff; border-bottom: 1px solid #bfdbfe;",
-    "  padding: 5px 14px; font-size: 11px; color: #1d4ed8;",
-    "  display: flex; align-items: center; gap: 5px; flex-shrink: 0;",
+    /* header */
+    "#tuto-hdr{",
+    "  background:" + p + "!important;",
+    "  border-bottom:2.5px solid " + g + "!important;",
+    "  padding:13px 16px!important;",
+    "  display:flex!important;align-items:center!important;justify-content:space-between!important;",
+    "  flex-shrink:0!important;width:100%!important;gap:0!important;",
     "}",
-
-    /* ── Quick chips ── */
-    "#tuto-chips {",
-    "  padding: 8px 12px;",
-    "  display: flex; flex-wrap: wrap; gap: 6px;",
-    "  background: #fafbfc; border-bottom: 1px solid #f0f2f5;",
-    "  flex-shrink: 0;",
+    "#tuto-hdr-l{display:flex!important;align-items:center!important;gap:10px!important;}",
+    "#tuto-logo{",
+    "  width:34px!important;height:34px!important;border-radius:8px!important;",
+    "  background:" + g + "!important;color:" + p + "!important;",
+    "  display:flex!important;align-items:center!important;justify-content:center!important;",
+    "  font-size:16px!important;font-weight:700!important;flex-shrink:0!important;",
     "}",
-    ".tuto-chip {",
-    "  cursor: pointer; font-size: 11px; padding: 5px 11px;",
-    "  border: 1px solid #c7d2fe; background: #fff; color: #3730a3;",
-    "  border-radius: 20px; font-weight: 500; line-height: 1.4;",
-    "  font-family: 'DM Sans', sans-serif;",
-    "  transition: background .15s;",
+    "#tuto-name{color:#fff!important;font-weight:600!important;font-size:14px!important;display:block!important;}",
+    "#tuto-sub{font-size:9px!important;color:rgba(255,255,255,.50)!important;text-transform:uppercase!important;letter-spacing:1.2px!important;display:block!important;margin-top:1px!important;}",
+    "#tuto-spill{",
+    "  display:flex!important;align-items:center!important;gap:5px!important;",
+    "  background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.15)!important;",
+    "  border-radius:20px!important;padding:4px 10px!important;flex-shrink:0!important;",
     "}",
-    ".tuto-chip:hover { background: #eef2ff; }",
+    "#tuto-dot{width:6px!important;height:6px!important;border-radius:50%!important;background:#ef4444!important;display:inline-block!important;flex-shrink:0!important;}",
+    "#tuto-slbl{font-size:9px!important;color:rgba(255,255,255,.80)!important;font-weight:500!important;text-transform:uppercase!important;letter-spacing:.5px!important;white-space:nowrap!important;}",
 
-    /* ════════════════════════════════════════════════════════════════ */
-    /* FIXED: Message bubbles - User message min-width issue resolved  */
-    /* ════════════════════════════════════════════════════════════════ */
-
-    /* Message wrapper */
-    ".tuto-msg-wrap { display: flex; margin-bottom: 10px; animation: tuto-msgin .3s ease-out; width: 100%; overflow: hidden; }",
-
-    /* User message wrapper - right aligned with proper padding */
-    ".tuto-msg-wrap.user { justify-content: flex-end; padding-left: 40px; }",
-
-    /* Bot message wrapper - left aligned */
-    ".tuto-msg-wrap.bot  { justify-content: flex-start; padding-right: 40px; }",
-
-    /* ═══ FIXED BUBBLE STYLES ═══ */
-    /* Base bubble */
-    ".tuto-bubble { max-width: 100%; word-break: break-word; overflow-wrap: break-word; padding: 10px 14px; font-size: 13px; line-height: 1.55; }",
-
-    /* ═══ USER BUBBLE FIX ═══ */
-    /* User bubble: proper min-width, fit-content width, inline-block display */
-    ".tuto-bubble.user { ",
-    "  background: " + T.primary + "; color: #fff;",
-    "  border-radius: 16px 16px 4px 16px;",
-    "  min-width: 60px;",                          /* FIXED: minimum width so short text doesn't shrink */
-    "  width: fit-content;",                       /* FIXED: width fits content but respects min-width */
-    "  display: inline-block;",                    /* FIXED: inline-block for proper width behavior */
-    "  flex-shrink: 0;",                           /* FIXED: don't shrink in flex container */
-    "  text-align: left;",                         /* FIXED: text stays left-aligned inside bubble */
-    "  box-shadow: 0 1px 2px rgba(0,0,0,0.1);",     /* subtle shadow for depth */
+    /* info bar */
+    "#tuto-info{",
+    "  background:#eff6ff!important;border-bottom:1px solid #bfdbfe!important;",
+    "  padding:5px 14px!important;font-size:11px!important;color:#1d4ed8!important;",
+    "  display:flex!important;align-items:center!important;gap:5px!important;flex-shrink:0!important;",
     "}",
 
-    /* Bot bubble */
-    ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
-    "  border: 1px solid #e2e8f0; border-radius: 16px 16px 16px 4px;",
-    "  width: 100%;",                              /* Bot takes full available width */
+    /* chips */
+    "#tuto-chips{",
+    "  padding:8px 12px!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;",
+    "  background:#fafbfc!important;border-bottom:1px solid #f0f2f5!important;flex-shrink:0!important;",
     "}",
+    ".tuto-chip{",
+    "  cursor:pointer!important;font-size:11px!important;padding:5px 11px!important;",
+    "  border:1px solid #c7d2fe!important;background:#fff!important;color:#3730a3!important;",
+    "  border-radius:20px!important;font-weight:500!important;line-height:1.4!important;",
+    "  font-family:'DM Sans','Segoe UI',sans-serif!important;",
+    "  transition:background .15s!important;",
+    "}",
+    ".tuto-chip:hover{background:#eef2ff!important;}",
 
-    /* Timestamp */
-    ".tuto-ts { font-size: 10px; margin-top: 4px; text-align: right; }",
-    ".tuto-bubble.user .tuto-ts { color: rgba(255,255,255,.6); }",
-    ".tuto-bubble.bot .tuto-ts  { color: #94a3b8; }",
+    /* messages */
+    "#tuto-msgs{",
+    "  flex:1!important;overflow-y:auto!important;overflow-x:hidden!important;",
+    "  padding:16px 12px!important;background:#f8fafc!important;min-height:0!important;",
+    "  display:flex!important;flex-direction:column!important;",
+    "}",
+    "#tuto-msgs::-webkit-scrollbar{width:4px!important;}",
+    "#tuto-msgs::-webkit-scrollbar-thumb{background:#cbd5e0!important;border-radius:4px!important;}",
 
-    /* Empty state */
-    ".tuto-empty { text-align: center; color: #64748b; padding-top: 30%; }",
-    ".tuto-empty .tuto-icon { font-size: 40px; margin-bottom: 10px; opacity: .4; }",
-    ".tuto-empty p { font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; }",
+    /* empty */
+    "#tuto-empty{text-align:center!important;color:#64748b!important;padding-top:25%!important;flex:1!important;}",
+    "#tuto-empty-icon{font-size:40px!important;margin-bottom:10px!important;opacity:.4!important;display:block!important;}",
+    "#tuto-empty p{font-size:13px!important;font-weight:500!important;line-height:1.6!important;}",
 
-    /* ── Typing dots ── */
-    "#tuto-typing { display: none; justify-content: flex-start; margin-bottom: 10px; }",
-    "#tuto-typing.show { display: flex; }",
-    ".tuto-typing-bubble {",
-    "  background: #fff; border: 1px solid #e2e8f0;",
-    "  border-radius: 14px 14px 14px 3px;",
-    "  padding: 12px 16px;",
-    "  display: inline-flex; gap: 5px; align-items: center;",
-    "}",
-    ".tuto-dot-anim {",
-    "  width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;",
-    "  animation: tuto-bounce 1.1s infinite;",
-    "}",
+    /* message rows — padding pushes opposite side so bubble doesn't fill full width */
+    ".tuto-row{display:flex!important;width:100%!important;margin-bottom:10px!important;flex-shrink:0!important;animation:tuto-msgin .3s ease-out;}",
+    ".tuto-row.user{justify-content:flex-end!important;padding-left:20%!important;}",
+    ".tuto-row.bot {justify-content:flex-start!important;padding-right:20%!important;}",
 
-    /* ── Input area ── */
-    "#tuto-input-area {",
-    "  padding: 10px 12px; background: #fff; border-top: 1px solid #e2e8f0;",
-    "  display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;",
+    /* bubbles */
+    ".tuto-bubble{",
+    "  padding:10px 13px!important;font-size:13px!important;line-height:1.55!important;",
+    "  word-break:break-word!important;overflow-wrap:break-word!important;max-width:100%!important;",
     "}",
-    "#tuto-textarea {",
-    "  flex: 1; resize: none; border-radius: 10px;",
-    "  font-size: 13.5px; font-family: 'DM Sans', sans-serif;",
-    "  min-height: 40px; max-height: 96px;",
-    "  padding: 10px 13px;",
-    "  border: 1px solid #e2e8f0; background: #fafbfc; color: #1e293b;",
-    "  outline: none; transition: border-color .15s; line-height: 1.5;",
-    "}",
-    "#tuto-textarea:focus { border-color: " + T.primary + "; }",
-    "#tuto-textarea:disabled { opacity: .55; cursor: not-allowed; }",
-    "#tuto-send {",
-    "  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;",
-    "  background: " + T.primary + ";",
-    "  border: none; color: #fff; font-size: 16px;",
-    "  cursor: pointer; display: flex; align-items: center; justify-content: center;",
-    "  transition: background .15s, transform .1s;",
-    "}",
-    "#tuto-send:disabled { background: #cbd5e0 !important; cursor: not-allowed; }",
-    "#tuto-send:not(:disabled):hover { transform: scale(1.06); }",
+    ".tuto-bubble.user{background:" + p + "!important;color:#fff!important;border-radius:16px 16px 4px 16px!important;}",
+    ".tuto-bubble.bot {background:#fff!important;color:#1e293b!important;border:1px solid #e2e8f0!important;border-radius:16px 16px 16px 4px!important;}",
+    ".tuto-ts{font-size:10px!important;margin-top:4px!important;text-align:right!important;}",
+    ".tuto-bubble.user .tuto-ts{color:rgba(255,255,255,.50)!important;}",
+    ".tuto-bubble.bot  .tuto-ts{color:#94a3b8!important;}",
+    ".tuto-bubble strong{font-weight:700!important;}",
 
-    /* ── Disconnected banner ── */
-    "#tuto-disconnected {",
-    "  display: none; padding: 6px 12px;",
-    "  background: #fef2f2; border-top: 1px solid #fecaca;",
-    "  font-size: 11px; color: #b91c1c; text-align: center; flex-shrink: 0;",
-    "  font-family: 'DM Sans', sans-serif;",
-    "}",
-    "#tuto-disconnected.show { display: block; }",
+    /* typing */
+    "#tuto-typing{display:none!important;justify-content:flex-start!important;margin-bottom:10px!important;flex-shrink:0!important;}",
+    "#tuto-typing.show{display:flex!important;}",
+    ".tuto-tbub{background:#fff!important;border:1px solid #e2e8f0!important;border-radius:14px 14px 14px 3px!important;padding:12px 16px!important;display:inline-flex!important;gap:5px!important;align-items:center!important;}",
+    ".tuto-d{width:6px!important;height:6px!important;border-radius:50%!important;background:#94a3b8!important;display:inline-block!important;animation:tuto-bounce 1.1s infinite;}",
 
-    /* ── Footer ── */
-    "#tuto-footer {",
-    "  padding: 6px; text-align: center; font-size: 10px; color: #94a3b8;",
-    "  background: #fafbfc; border-top: 1px solid #f1f5f9; flex-shrink: 0;",
-    "  font-family: 'DM Sans', sans-serif;",
+    /* input area */
+    "#tuto-input-area{",
+    "  padding:10px 12px!important;background:#fff!important;border-top:1px solid #e2e8f0!important;",
+    "  display:flex!important;gap:8px!important;align-items:flex-end!important;flex-shrink:0!important;",
     "}",
-    "#tuto-footer a { color: #94a3b8; text-decoration: none; }",
-    "#tuto-footer a:hover { color: " + T.primary + "; }",
-
-    /* ── Animations ── */
-    "@keyframes tuto-pop   { from { opacity:0; transform:scale(.88); } to { opacity:1; transform:scale(1); } }",
-    "@keyframes tuto-msgin { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }",
-    "@keyframes tuto-bounce { 0%,80%,100% { transform:scale(.75); opacity:.3; } 40% { transform:scale(1.1); opacity:1; } }",
-
-    /* ── Mobile responsive ── */
-    "@media (max-width: 480px) {",
-    "  #tuto-panel { width: calc(100vw - 20px); " + cfg.position + ": 10px; height: 78vh; }",
-    "  .tuto-msg-wrap.user { padding-left: 20px; }",
-    "  .tuto-msg-wrap.bot  { padding-right: 20px; }",
-    "  .tuto-bubble { max-width: 100%; }",
+    "#tuto-ta{",
+    "  flex:1!important;min-width:0!important;resize:none!important;border-radius:10px!important;",
+    "  font-size:13.5px!important;font-family:'DM Sans','Segoe UI',sans-serif!important;",
+    "  min-height:40px!important;max-height:96px!important;",
+    "  padding:10px 13px!important;",
+    "  border:1px solid #e2e8f0!important;background:#fafbfc!important;color:#1e293b!important;",
+    "  outline:none!important;transition:border-color .15s!important;line-height:1.5!important;",
+    "  display:block!important;",
     "}",
+    "#tuto-ta:focus{border-color:" + p + "!important;}",
+    "#tuto-ta:disabled{opacity:.55!important;cursor:not-allowed!important;}",
+    "#tuto-send{",
+    "  width:40px!important;height:40px!important;border-radius:10px!important;flex-shrink:0!important;",
+    "  background:" + p + "!important;border:none!important;color:#fff!important;font-size:18px!important;",
+    "  cursor:pointer!important;display:flex!important;align-items:center!important;justify-content:center!important;",
+    "  transition:background .15s,transform .1s!important;line-height:1!important;",
+    "}",
+    "#tuto-send:disabled{background:#cbd5e0!important;cursor:not-allowed!important;}",
+    "#tuto-send:not(:disabled):hover{transform:scale(1.06)!important;}",
+
+    /* disconnected */
+    "#tuto-discon{display:none!important;padding:6px 12px!important;background:#fef2f2!important;border-top:1px solid #fecaca!important;font-size:11px!important;color:#b91c1c!important;text-align:center!important;flex-shrink:0!important;}",
+    "#tuto-discon.show{display:block!important;}",
+
+    /* footer */
+    "#tuto-footer{padding:6px!important;text-align:center!important;font-size:10px!important;color:#94a3b8!important;background:#fafbfc!important;border-top:1px solid #f1f5f9!important;flex-shrink:0!important;}",
+    "#tuto-footer a{color:#94a3b8!important;text-decoration:none!important;}",
+    "#tuto-footer a:hover{color:" + p + "!important;}",
+
+    /* mobile */
+    "@media(max-width:480px){#tuto-panel{width:calc(100vw - 20px)!important;" + POS + ":-10px!important;height:78vh!important;}}",
+
+    /* keyframes */
+    "@keyframes tuto-pop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}",
+    "@keyframes tuto-msgin{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}",
+    "@keyframes tuto-bounce{0%,80%,100%{transform:scale(.75);opacity:.3}40%{transform:scale(1.1);opacity:1}}",
   ].join("\n");
-  document.head.appendChild(style);
 
-  /* ── 5. Quick chips list ───────────────────────────────────────── */
+  var styleEl = doc.createElement("style");
+  styleEl.textContent = CSS;
+  doc.head.appendChild(styleEl);
+
+  /* ─── 5. Quick chips ────────────────────────────────────────── */
   var QUICK = [
     "Start my intake form",
     "What is my claim probability?",
@@ -308,299 +733,222 @@
     "Show all my details",
   ];
 
-  /* ── 6. Build DOM ──────────────────────────────────────────────── */
-  var root = document.createElement("div");
+  /* ─── 6. Build DOM ──────────────────────────────────────────── */
+  var root = doc.createElement("div");
   root.id = "tuto-root";
-  root.innerHTML = [
-    /* Tooltip */
-    '<div id="tuto-tooltip">',
-    '  <span>' + cfg.label + '</span>',
-    '  <button id="tuto-tooltip-close" title="Dismiss">✕</button>',
-    '</div>',
+  root.innerHTML =
+    '<div id="tuto-tip">' +
+      '<span>' + cfg.label + '</span>' +
+      '<button id="tuto-tip-x" title="Dismiss">&#10005;</button>' +
+    '</div>' +
 
-    /* FAB */
-    '<button id="tuto-fab" aria-label="Open chat">',
-    '  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
-    '    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>',
-    '  </svg>',
-    '  <span id="tuto-fab-close">✕</span>',
-    '  <span id="tuto-badge">1</span>',
-    '</button>',
+    '<button id="tuto-fab" aria-label="Open chat">' +
+      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>' +
+      '</svg>' +
+      '<span id="tuto-fab-x">&#10005;</span>' +
+      '<span id="tuto-badge">1</span>' +
+    '</button>' +
 
-    /* Panel */
-    '<div id="tuto-panel" role="dialog" aria-label="Chat">',
+    '<div id="tuto-panel" role="dialog" aria-label="Chat">' +
 
-    /* Header */
-    '  <div id="tuto-header">',
-    '    <div style="display:flex;align-items:center;gap:10px;">',
-    '      <div id="tuto-logo">T</div>',
-    '      <div id="tuto-header-text">',
-    '        <div id="tuto-title">Tell Us The Odds℠</div>',
-    '        <div id="tuto-subtitle">Valuation Services</div>',
-    '      </div>',
-    '    </div>',
-    '    <div id="tuto-status">',
-    '      <span id="tuto-dot"></span>',
-    '      <span id="tuto-status-label">Connecting</span>',
-    '    </div>',
-    '  </div>',
+      '<div id="tuto-hdr">' +
+        '<div id="tuto-hdr-l">' +
+          '<div id="tuto-logo">T</div>' +
+          '<div>' +
+            '<span id="tuto-name">Tell Us The Odds&#8480;</span>' +
+            '<span id="tuto-sub">Valuation Services</span>' +
+          '</div>' +
+        '</div>' +
+        '<div id="tuto-spill">' +
+          '<span id="tuto-dot"></span>' +
+          '<span id="tuto-slbl">Connecting</span>' +
+        '</div>' +
+      '</div>' +
 
-    /* Info bar */
-    '  <div id="tuto-infobar">ℹ️ Educational guidance only — not financial or legal advice.</div>',
+      '<div id="tuto-info">&#8505;&#65039; Educational guidance only &#8212; not financial or legal advice.</div>' +
 
-    /* Chips */
-    '  <div id="tuto-chips">',
-    QUICK.map(function (q) {
-      return '<button class="tuto-chip" data-q="' + q.replace(/"/g, "&quot;") + '">' + q + '</button>';
-    }).join(""),
-    '  </div>',
+      '<div id="tuto-chips">' +
+        QUICK.map(function (q) {
+          return '<button class="tuto-chip" data-q="' + q.replace(/"/g, "&quot;") + '">' + q + '</button>';
+        }).join("") +
+      '</div>' +
 
-    /* Messages */
-    '  <div id="tuto-messages">',
-    '    <div class="tuto-empty" id="tuto-empty">',
-    '      <div class="tuto-icon">📝</div>',
-    '      <p>How can we help with your<br>policy analysis today?</p>',
-    '    </div>',
-    '    <div id="tuto-typing">',
-    '      <div class="tuto-typing-bubble">',
-    '        <span class="tuto-dot-anim" style="animation-delay:0s"></span>',
-    '        <span class="tuto-dot-anim" style="animation-delay:.18s"></span>',
-    '        <span class="tuto-dot-anim" style="animation-delay:.36s"></span>',
-    '      </div>',
-    '    </div>',
-    '  </div>',
+      '<div id="tuto-msgs">' +
+        '<div id="tuto-empty">' +
+          '<span id="tuto-empty-icon">&#128221;</span>' +
+          '<p>How can we help with your<br>policy analysis today?</p>' +
+        '</div>' +
+        '<div id="tuto-typing">' +
+          '<div class="tuto-tbub">' +
+            '<span class="tuto-d" style="animation-delay:0s"></span>' +
+            '<span class="tuto-d" style="animation-delay:.18s"></span>' +
+            '<span class="tuto-d" style="animation-delay:.36s"></span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
 
-    /* Input */
-    '  <div id="tuto-input-area">',
-    '    <textarea id="tuto-textarea" rows="1" placeholder="Type your message…" disabled></textarea>',
-    '    <button id="tuto-send" disabled>➤</button>',
-    '  </div>',
+      '<div id="tuto-input-area">' +
+        '<textarea id="tuto-ta" rows="1" placeholder="Type your message&#8230;" disabled></textarea>' +
+        '<button id="tuto-send" disabled>&#10148;</button>' +
+      '</div>' +
 
-    /* Disconnected */
-    '  <div id="tuto-disconnected">⚠️ Disconnected — reconnecting automatically…</div>',
+      '<div id="tuto-discon">&#9888;&#65039; Disconnected &#8212; reconnecting automatically&#8230;</div>' +
 
-    /* Footer */
-    '  <div id="tuto-footer">',
-    "    Sutter's Mill Valuation Services &nbsp;|&nbsp;",
-    '    <a href="https://tellustheodds.com" target="_blank" rel="noopener">tellustheodds.com</a>',
-    '  </div>',
+      '<div id="tuto-footer">' +
+        "Sutter's Mill Valuation Services &nbsp;|&nbsp;" +
+        '<a href="https://tellustheodds.com" target="_blank" rel="noopener">tellustheodds.com</a>' +
+      '</div>' +
 
-    '</div>', /* end panel */
-  ].join("");
+    '</div>';
 
-  document.body.appendChild(root);
+  doc.body.appendChild(root);
 
-  /* ── 7. Element refs ───────────────────────────────────────────── */
-  var $fab       = document.getElementById("tuto-fab");
-  var $fabClose  = document.getElementById("tuto-fab-close");
-  var $fabSvg    = $fab.querySelector("svg");
-  var $badge     = document.getElementById("tuto-badge");
-  var $tooltip   = document.getElementById("tuto-tooltip");
-  var $ttClose   = document.getElementById("tuto-tooltip-close");
-  var $panel     = document.getElementById("tuto-panel");
-  var $msgs      = document.getElementById("tuto-messages");
-  var $empty     = document.getElementById("tuto-empty");
-  var $typing    = document.getElementById("tuto-typing");
-  var $chips     = document.getElementById("tuto-chips");
-  var $dot       = document.getElementById("tuto-dot");
-  var $statusLbl = document.getElementById("tuto-status-label");
-  var $textarea  = document.getElementById("tuto-textarea");
-  var $send      = document.getElementById("tuto-send");
-  var $discon    = document.getElementById("tuto-disconnected");
+  /* ─── 7. Element refs ───────────────────────────────────────── */
+  var $fab    = doc.getElementById("tuto-fab");
+  var $fabX   = doc.getElementById("tuto-fab-x");
+  var $fabSvg = $fab.querySelector("svg");
+  var $badge  = doc.getElementById("tuto-badge");
+  var $tip    = doc.getElementById("tuto-tip");
+  var $tipX   = doc.getElementById("tuto-tip-x");
+  var $panel  = doc.getElementById("tuto-panel");
+  var $msgs   = doc.getElementById("tuto-msgs");
+  var $empty  = doc.getElementById("tuto-empty");
+  var $typing = doc.getElementById("tuto-typing");
+  var $chips  = doc.getElementById("tuto-chips");
+  var $dot    = doc.getElementById("tuto-dot");
+  var $slbl   = doc.getElementById("tuto-slbl");
+  var $ta     = doc.getElementById("tuto-ta");
+  var $send   = doc.getElementById("tuto-send");
+  var $discon = doc.getElementById("tuto-discon");
 
-  var isOpen   = false;
-  var msgCount = 0;
+  var isOpen = false, msgCount = 0;
 
-  /* ── 8. Open / close ───────────────────────────────────────────── */
+  /* ─── 8. Open / close ───────────────────────────────────────── */
   function openPanel() {
     isOpen = true;
     $panel.classList.add("open");
-    $fabSvg.style.display   = "none";
-    $fabClose.style.display = "block";
-    $badge.style.display    = "none";
-    $tooltip.style.display  = "none";
-    $textarea.focus();
+    $fabSvg.style.setProperty("display", "none",  "important");
+    $fabX.style.setProperty(  "display", "block", "important");
+    $badge.style.setProperty( "display", "none",  "important");
+    $tip.style.setProperty(   "display", "none",  "important");
+    $ta.focus();
     scrollBottom();
   }
   function closePanel() {
     isOpen = false;
     $panel.classList.remove("open");
-    $fabSvg.style.display   = "block";
-    $fabClose.style.display = "none";
+    $fabSvg.style.setProperty("display", "block", "important");
+    $fabX.style.setProperty(  "display", "none",  "important");
   }
+  $fab.addEventListener("click", function () { isOpen ? closePanel() : openPanel(); });
+  $tipX.addEventListener("click", function (e) { e.stopPropagation(); $tip.style.setProperty("display","none","important"); });
+  doc.addEventListener("keydown", function (e) { if (e.key === "Escape" && isOpen) closePanel(); });
 
-  $fab.addEventListener("click", function () {
-    isOpen ? closePanel() : openPanel();
-  });
-  $ttClose.addEventListener("click", function (e) {
-    e.stopPropagation();
-    $tooltip.style.display = "none";
-  });
+  /* ─── 9. Helpers ────────────────────────────────────────────── */
+  function scrollBottom() { setTimeout(function () { $msgs.scrollTop = $msgs.scrollHeight; }, 50); }
+  function nowStr() { return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
 
-  /* ── 9. Scroll helper ──────────────────────────────────────────── */
-  function scrollBottom() {
-    setTimeout(function () { $msgs.scrollTop = $msgs.scrollHeight; }, 50);
-  }
-
-  /* ── 10. Render a message bubble ───────────────────────────────── */
+  /* ─── 10. Add message ───────────────────────────────────────── */
   function addMessage(text, type, ts) {
     msgCount++;
     if (msgCount === 1) {
-      $empty.style.display = "none";
-      $chips.style.display = "none";
+      $empty.style.setProperty("display", "none", "important");
+      $chips.style.setProperty("display", "none", "important");
     }
-    var wrap = document.createElement("div");
-    wrap.className = "tuto-msg-wrap " + type;
-
-    var bubble = document.createElement("div");
-    bubble.className = "tuto-bubble " + type;
-
-    /* Simple markdown: **bold** and newlines */
-    var html = text
+    var html = (text || "")
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\n/g, "<br>");
-    bubble.innerHTML = html + '<div class="tuto-ts">' + (ts || now()) + '</div>';
 
-    wrap.appendChild(bubble);
-    $msgs.insertBefore(wrap, $typing);
+    var row = doc.createElement("div");
+    row.className = "tuto-row " + type;
+
+    var bub = doc.createElement("div");
+    bub.className = "tuto-bubble " + type;
+    bub.innerHTML = html + '<div class="tuto-ts">' + (ts || nowStr()) + "</div>";
+
+    row.appendChild(bub);
+    $msgs.insertBefore(row, $typing);
     scrollBottom();
   }
 
-  function now() {
-    return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  }
-
-  /* ── 11. Status indicator ──────────────────────────────────────── */
-  var STATUS_COLORS = {
-    connected:    "#22c55e",
-    connecting:   "#eab308",
-    disconnected: "#ef4444",
-    error:        "#ef4444",
-  };
-
+  /* ─── 11. Status ────────────────────────────────────────────── */
+  var SC = { connected: "#22c55e", connecting: "#eab308", disconnected: "#ef4444", error: "#ef4444" };
   function setStatus(s) {
-    $dot.style.background = STATUS_COLORS[s] || "#ef4444";
-    $statusLbl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
-    var conn = s === "connected";
-    $textarea.disabled = !conn;
-    $send.disabled = !conn || !$textarea.value.trim();
-    if (s === "disconnected" || s === "error") {
-      $discon.classList.add("show");
-    } else {
-      $discon.classList.remove("show");
-    }
+    $dot.style.setProperty("background", SC[s] || "#ef4444", "important");
+    $slbl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+    var ok = s === "connected";
+    $ta.disabled   = !ok;
+    $send.disabled = !ok || !$ta.value.trim();
+    if (s === "disconnected" || s === "error") $discon.classList.add("show");
+    else $discon.classList.remove("show");
   }
 
-  /* ── 12. WebSocket ─────────────────────────────────────────────── */
-  var ws, reconnectTimer;
-
+  /* ─── 12. WebSocket ─────────────────────────────────────────── */
+  var ws, rt;
   function connect() {
     setStatus("connecting");
-    var url = cfg.wsUrl + "/ws/chat?session_id=" + SESSION_ID;
-    ws = new WebSocket(url);
-
+    ws = new WebSocket(cfg.wsUrl + "/ws/chat?session_id=" + SESSION_ID);
     ws.onopen = function () { setStatus("connected"); };
-
     ws.onmessage = function (e) {
-      var data;
-      try { data = JSON.parse(e.data); } catch (ex) { return; }
-
-      if (data.type === "history") {
-        (data.messages || []).forEach(function (m) {
-          var t = m.created_at
-            ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-            : "";
+      var d; try { d = JSON.parse(e.data); } catch (_) { return; }
+      if (d.type === "history") {
+        (d.messages || []).forEach(function (m) {
+          var t = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) : "";
           addMessage(m.content || m.text || "", m.sender === "user" ? "user" : "bot", t);
         });
         return;
       }
-      if (data.type === "bot") {
-        $typing.classList.remove("show");
-        addMessage(data.text || "", "bot", data.timestamp || "");
-      }
+      if (d.type === "bot") { $typing.classList.remove("show"); addMessage(d.text || "", "bot", d.timestamp || ""); }
     };
-
     ws.onerror = function () { setStatus("error"); };
-    ws.onclose = function () {
-      setStatus("disconnected");
-      clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(connect, 3000);
-    };
+    ws.onclose = function () { setStatus("disconnected"); clearTimeout(rt); rt = setTimeout(connect, 3000); };
   }
 
-  /* ── 13. Typing indicator ──────────────────────────────────────── */
-  var typingTimeout;
+  /* ─── 13. Typing indicator ──────────────────────────────────── */
+  var tt;
   function showTyping() {
-    $typing.classList.add("show");
-    scrollBottom();
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(function () {
-      $typing.classList.remove("show");
-    }, 15000);
+    $typing.classList.add("show"); scrollBottom();
+    clearTimeout(tt); tt = setTimeout(function () { $typing.classList.remove("show"); }, 15000);
   }
 
-  /* ── 14. Send message ──────────────────────────────────────────── */
-  function sendMessage(text) {
+  /* ─── 14. Send ──────────────────────────────────────────────── */
+  function sendMsg(text) {
     if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
-    addMessage(text, "user", now());
+    addMessage(text, "user", nowStr());
     showTyping();
-    ws.send(JSON.stringify({
-      text:       text,
-      session_id: SESSION_ID,
-      timestamp:  now(),
-    }));
+    ws.send(JSON.stringify({ text: text, session_id: SESSION_ID, timestamp: nowStr() }));
   }
 
-  /* ── 15. Input listeners ───────────────────────────────────────── */
-  $textarea.addEventListener("input", function () {
+  /* ─── 15. Input listeners ───────────────────────────────────── */
+  $ta.addEventListener("input", function () {
     $send.disabled = !this.value.trim() || !ws || ws.readyState !== WebSocket.OPEN;
     this.style.height = "auto";
     this.style.height = Math.min(this.scrollHeight, 96) + "px";
   });
-
-  $textarea.addEventListener("keydown", function (e) {
+  $ta.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      var text = $textarea.value.trim();
-      if (text) {
-        $textarea.value = "";
-        $textarea.style.height = "auto";
-        $send.disabled = true;
-        sendMessage(text);
-      }
+      var t = $ta.value.trim();
+      if (t) { $ta.value = ""; $ta.style.height = "auto"; $send.disabled = true; sendMsg(t); }
     }
   });
-
   $send.addEventListener("click", function () {
-    var text = $textarea.value.trim();
-    if (text) {
-      $textarea.value = "";
-      $textarea.style.height = "auto";
-      $send.disabled = true;
-      sendMessage(text);
-    }
+    var t = $ta.value.trim();
+    if (t) { $ta.value = ""; $ta.style.height = "auto"; $send.disabled = true; sendMsg(t); }
   });
 
-  /* ── 16. Quick chips ───────────────────────────────────────────── */
+  /* ─── 16. Chips ─────────────────────────────────────────────── */
   $chips.addEventListener("click", function (e) {
-    var chip = e.target.closest(".tuto-chip");
-    if (chip) sendMessage(chip.dataset.q);
+    var c = e.target.closest(".tuto-chip");
+    if (c) sendMsg(c.dataset.q);
   });
 
-  /* ── 17. Keyboard accessibility ────────────────────────────────── */
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && isOpen) closePanel();
-  });
-
-  /* ── 18. Boot ──────────────────────────────────────────────────── */
+  /* ─── 17. Boot ──────────────────────────────────────────────── */
   connect();
 
-  /* ── 19. Public API ────────────────────────────────────────────── */
-  window.TutoWidget = {
-    open:  openPanel,
-    close: closePanel,
-    send:  sendMessage,
-  };
+  /* ─── 18. Public API ────────────────────────────────────────── */
+  win.TutoWidget = { open: openPanel, close: closePanel, send: sendMsg };
 
 })(window, document);
