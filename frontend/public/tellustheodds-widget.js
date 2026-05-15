@@ -591,6 +591,7 @@
   var SESSION_ID = getSessionId();
 
   /* ── 4. Inject CSS ────────────────────────────────────────────── */
+    /* ── 4. Inject CSS ────────────────────────────────────────────── */
   var style = document.createElement("style");
   style.textContent = [
     "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');",
@@ -678,7 +679,7 @@
     ".tuto-msg-wrap.bot  { justify-content: flex-start; }",
     '.tuto-bubble { max-width: 75%; min-width: 60px; padding: 12px 14px; font-size: 13px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }',
     ".tuto-bubble.user { background: " + T.primary + "; color: #fff;",
-    "  border-radius: 8px 8px 2px 8px; box-shadow: 0 2px 8px rgba(72, 134, 255, 0.15); margin-right: 6px; padding: 16px 18px; }",  // ← INCREASED PADDING HERE
+    "  border-radius: 8px 8px 2px 8px; box-shadow: 0 2px 8px rgba(72, 134, 255, 0.15); margin-right: 10px; padding: 14px 20px; }",  // ← UPDATED
     ".tuto-bubble.bot  { background: #fff; color: #1e293b;",
     "  border: 1px solid #e2e8f0; border-radius: 16px 16px 16px 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }",
     ".tuto-ts { font-size: 11px; margin-top: 6px; text-align: right; font-weight: 500; }",
@@ -739,7 +740,7 @@
     "}",
   ].join("\n");
   document.head.appendChild(style);
-
+  
   /* ── 5. Build DOM ──────────────────────────────────────────────── */
   var QUICK = [
     "Start my intake form",
