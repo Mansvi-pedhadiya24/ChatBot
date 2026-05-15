@@ -130,8 +130,8 @@
     "  animation: tuto-bounce 1.1s infinite; }",
 
     /* Input area */
-    "#tuto-input-area { padding: 12px 14px; background: #fff; border-top: 1px solid #e2e8f0;",
-    "  display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }",
+    "#tuto-input-area { padding: 16px 18px; background: #fff; border-top: 1px solid #e2e8f0;",
+    "  display: flex; gap: 12px; align-items: flex-end; flex-shrink: 0; }",
     "#tuto-textarea { flex: 1; resize: none; border-radius: 10px; font-size: 13px;",
     "  min-height: 40px; max-height: 96px; padding: 10px 14px;",
     "  border: 1px solid #e2e8f0; background: #f8fafc; color: #1e293b;",
