@@ -132,7 +132,7 @@
     ".tuto-chip:hover { background: #eef2ff; border-color: #a5b4fc; }",
 
     /* Messages */
-    "#tuto-messages { flex: 1; overflow-y: auto; padding: 20px 14px; background: #f8fafc; min-height: 0; overflow-x: hidden; }",
+    "#tuto-messages { flex: 1; overflow-y: auto; padding: 20px 14px 20px 14px; background: #f8fafc; min-height: 0; overflow-x: hidden; }",
     "#tuto-messages::-webkit-scrollbar { width: 4px; }",
     "#tuto-messages::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }",
     ".tuto-msg-wrap { display: flex; margin-bottom: 14px; animation: tuto-msgin .3s ease-out; padding: 0 4px; }",
