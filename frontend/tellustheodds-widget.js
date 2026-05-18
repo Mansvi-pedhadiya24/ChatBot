@@ -8,8 +8,8 @@
   /* ── 1. Config (merge user settings with defaults) */
   var cfg = Object.assign(
     {
-      wsUrl:    "ws://127.0.0.1:8001",
-      apiUrl:   "http://127.0.0.1:8001",
+      wsUrl:    "ws://192.168.0.245:8001",
+      apiUrl:   "http://192.168.0.245:8001",
       position: "right",
       theme:    "navy",
       label:    "Free to Ask",

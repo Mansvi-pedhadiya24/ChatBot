@@ -21,7 +21,7 @@ const QUICK_QUESTIONS = [
 
 export default function App() {
   const [sessionId, setSessionId] = useState("");
-  const wsUrl = `ws://127.0.0.1:8001/ws/chat?session_id=${sessionId}`;
+  const wsUrl = `ws://192.168.0.245:8001/ws/chat?session_id=${sessionId}`;
   const { status, messages, send } = useWebSocket(wsUrl, sessionId);
   const typing = useTyping(sessionId);
 
